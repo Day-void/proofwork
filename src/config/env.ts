@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const envSchema = z.object({
   // Database
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: z.url().optional(),
 
   // Authentication
   BETTER_AUTH_SECRET: z.string().min(32).optional(),
-  BETTER_AUTH_URL: z.string().url().default('http://localhost:3000'),
+  BETTER_AUTH_URL: z.url().default('http://localhost:3000'),
 
   // OpenAI
   OPENAI_API_KEY: z.string().optional(),
@@ -18,7 +18,7 @@ const envSchema = z.object({
   R2_BUCKET_NAME: z.string().optional(),
 
   // Application
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_APP_URL: z.url().default('http://localhost:3000'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 
@@ -30,7 +30,7 @@ function getEnv(): Env {
   if (!parsed.success) {
     console.error(
       '❌ Invalid environment variables:',
-      parsed.error.flatten().fieldErrors
+      z.prettifyError(parsed.error)
     );
     // In development, allow startup with warnings
     // In production, this should throw
