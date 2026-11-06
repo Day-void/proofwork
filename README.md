@@ -6,12 +6,12 @@ ProofWork bridges the gap between having practical skills and being able to demo
 
 ## Status
 
-**Phase 0 — Foundation** (in progress)
+**Phase 2 — Authentication & Database** (in progress)
 
 ## Tech Stack
 
-- **Frontend:** Next.js 15.1 (App Router), React 19, TypeScript
-- **Styling:** Tailwind CSS 3.4, shadcn/ui, Lucide React
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript
+- **Styling:** Tailwind CSS 4, shadcn/ui, Lucide React
 - **Backend:** Next.js Route Handlers, Zod validation
 - **Database:** PostgreSQL (Neon), Drizzle ORM
 - **Auth:** Better Auth (RBAC)
@@ -23,7 +23,7 @@ ProofWork bridges the gap between having practical skills and being able to demo
 
 ### Prerequisites
 
-- Node.js 18.17+
+- Node.js 20.9+
 - npm 9+
 
 ### Setup
@@ -38,9 +38,15 @@ npm install
 # Copy environment template
 cp .env.example .env.local
 
+# Add Neon and Resend credentials to .env.local, then generate and apply the schema
+npm run db:generate
+npm run db:migrate
+
 # Start development server
 npm run dev
 ```
+
+Password recovery requires a Resend API key and a sender address from a verified domain. New accounts receive the `learner` role. No administrator account is created by registration.
 
 ### Scripts
 
@@ -50,6 +56,10 @@ npm run dev
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint |
+| `npm run typecheck` | Type-check the application |
+| `npm run db:generate` | Generate SQL migrations from the Drizzle schema |
+| `npm run db:migrate` | Apply pending migrations using `DATABASE_URL_UNPOOLED` (falls back to `DATABASE_URL`) |
+| `npm run db:studio` | Open Drizzle Studio for the configured database |
 
 ## Project Structure
 

@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-*Last updated: 2026-11-05 (Foundation Audit Completed)*
+*Last updated: 2026-11-06 (Phase 2 authentication foundation implemented)*
 
 ## Phase 0 — Foundation & Final Foundation Audit ✅
 
@@ -20,28 +20,35 @@
 - [x] Verify development server starts and renders homepage with Status 200
 - [x] Update documentation (FEATURE_STATUS.md, IMPLEMENTATION_ROADMAP.md, ARCHITECTURE_DECISIONS.md)
 
-## Phase 1 — UI Foundation
+## Phase 1 — UI Foundation (in progress)
 
-- [ ] Complete design system (typography, colors, elevation, focus rings)
-- [ ] Build public landing page (hero, value proposition, evidence mechanism, assessor explanation, CTA)
-- [ ] Build responsive navigation component (header, mobile drawer, user menu)
-- [ ] Create authentication page layouts (login, register, forgot-password)
-- [ ] Create learner dashboard shell (submission lists, portfolio overview, status tracking)
-- [ ] Create assessor dashboard shell (assigned queues, assessment workspace shell)
-- [ ] Create admin dashboard shell (platform health, user management shell, metrics)
-- [ ] Ensure full keyboard accessibility and screen-reader semantics
-- [ ] Source and optimize visual assets and iconography
+- [x] Complete design system foundations (typography, colors, elevation, focus rings)
+- [x] Build public landing page (hero, value proposition, evidence mechanism, assessor explanation, CTA)
+- [x] Build responsive navigation component (header, mobile disclosure menu, workspace menu)
+- [x] Create authentication page layouts (login, register, forgot-password)
+- [x] Create learner dashboard shell (project overview, reports, empty states)
+- [x] Create assessor dashboard shell (review queue overview)
+- [x] Create admin dashboard shell (platform overview, users and health navigation)
+- [x] Add keyboard focus and screen-reader semantics to primary journeys
+- [ ] Manually review keyboard flow, focus placement, and screen-reader output
+- [x] Use Lucide iconography and CSS-generated product preview elements
+- [x] Verify production build with Webpack (custom temporary output directory; all eight routes prerendered)
+- [ ] Visually review responsive layouts across browser sizes
 
-## Phase 2 — Authentication & Database
+## Phase 2 — Authentication & Database (in progress)
 
-- [ ] Design and implement Drizzle PostgreSQL schema
-- [ ] Create and test initial database migrations
-- [ ] Configure Better Auth with Neon serverless driver
-- [ ] Implement registration flow with email validation
-- [ ] Implement login flow with secure session management
-- [ ] Implement role-based access control (Learner, Assessor, Moderator, Admin)
-- [ ] Implement server-side authorization guards and Next.js middleware
-- [ ] Add protected route boundaries
+- [x] Design and implement Drizzle PostgreSQL auth schema
+- [x] Generate initial SQL migration
+- [ ] Apply and verify initial migration against a configured Neon database
+- [x] Configure Better Auth with Neon serverless HTTP driver
+- [x] Implement registration flow with email validation (new users are learners)
+- [x] Implement login and secure database-backed session handling
+- [x] Implement role-based access control (Learner, Assessor, Moderator, Admin)
+- [x] Add server-side authorization guards to protected workspaces
+- [x] Add protected route boundaries
+- [x] Implement password recovery request and reset flows
+- [x] Integrate Resend password-reset email delivery
+- [ ] Configure production database, auth secret, and verified email sender
 
 ## Phase 3 — Learner Submissions
 

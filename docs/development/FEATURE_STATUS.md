@@ -36,26 +36,31 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Design system | 🔄 | Core tokens in `@theme inline`, 6 UI primitives added |
-| Public landing page | ⬜ | Ready to build in Phase 1 |
-| Navigation | ⬜ | Ready to build in Phase 1 |
-| Authentication pages | ⬜ | Ready to build in Phase 1 |
-| Learner dashboard shell | ⬜ | Ready to build in Phase 1 |
-| Assessor dashboard shell | ⬜ | Ready to build in Phase 1 |
-| Admin dashboard shell | ⬜ | Ready to build in Phase 1 |
+| Design system | ✅ | Core tokens, type scale, elevation, and global focus-visible treatment |
+| Public landing page | ✅ | Responsive hero, evidence report preview, process, assessor value proposition, and CTAs |
+| Navigation | ✅ | Responsive public navigation with mobile disclosure menu and workspace menu |
+| Authentication pages | ✅ | Login, learner registration, password-reset request, and reset forms are connected to Better Auth |
+| Learner dashboard shell | ✅ | Workspace overview, project and report sections, empty states |
+| Assessor dashboard shell | ✅ | Review queue, assessment workspace outline, and guidance sections |
+| Admin dashboard shell | ✅ | User and platform health sections |
+| Keyboard and screen-reader foundations | 🔄 | Landmarks, labels, native disclosure menus, and visible focus styles are in place; manual assistive-technology review remains |
+| Visual assets | ✅ | Lucide icons and a CSS-generated product report preview; no external asset dependency |
+| Production build | ✅ | Webpack build passed after the final shell revision; all eight routes prerendered using an isolated output directory |
 
 ## Phase 2 — Authentication & Database
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Database schema | ⬜ | Drizzle ORM 0.45.4 verified compatible |
-| Database migrations | ⬜ | Drizzle Kit 0.31.11 |
-| Better Auth integration | ⬜ | Better Auth 1.7.16 verified compatible |
-| User registration | ⬜ | |
-| Login | ⬜ | |
-| Session handling | ⬜ | |
-| RBAC | ⬜ | |
-| Protected routes | ⬜ | |
+| Database schema | ✅ | Auth tables, learner-default role, and foreign keys defined with Drizzle |
+| Database migrations | 🔄 | Initial SQL generated; awaiting configured Neon URL before applying |
+| Better Auth integration | ✅ | Neon HTTP adapter, Next route handler, and secure session policy |
+| User registration | ✅ | Email/password registration; role is server-controlled and defaults to learner |
+| Login | ✅ | Email/password sign-in with workspace routing |
+| Session handling | ✅ | Seven-day database sessions and password-reset revocation |
+| RBAC | ✅ | Learner, assessor, moderator, and admin roles enforced server-side |
+| Protected routes | ✅ | Workspace pages require the matching authenticated role |
+| Password recovery | ✅ | One-hour reset token, generic request response, Resend delivery, and rate limits |
+| Runtime credentials | 🔄 | Ignored `.env.local` now has a generated development secret and local URLs; Neon URL and Resend key/sender still need configuration |
 
 ## Phase 3 — Learner Submissions
 
@@ -115,4 +120,4 @@
 
 ## Technical Blockers
 
-*None. Phase 0 Foundation Audit complete. Ready to begin Phase 1.*
+- The in-app browser could not reach the local preview on either `localhost:3000` or `127.0.0.1:3000`, so responsive visual review remains pending.

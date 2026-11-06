@@ -8,15 +8,15 @@ ProofWork is a skills verification and assessment platform built as a **modular 
 
 | Layer | Technology | Version |
 |-------|-----------|--------|
-| Frontend | Next.js (App Router) + React | 15.1.0 / 19.0.0 |
+| Frontend | Next.js (App Router) + React | 16.4.5 / 19.0.0 |
 | Language | TypeScript | 5.7.3 |
-| Styling | Tailwind CSS + shadcn/ui | 3.4.17 |
+| Styling | Tailwind CSS + shadcn/ui | 4.3.4 |
 | Icons | Lucide React | 1.67.0 |
-| Backend | Next.js Route Handlers | 15.1.0 |
-| Database | PostgreSQL (Neon) | — |
+| Backend | Next.js Route Handlers | 16.4.5 |
+| Database | PostgreSQL (Neon HTTP) | — |
 | ORM | Drizzle ORM | 0.45.4 |
 | Authentication | Better Auth | 1.7.16 |
-| Validation | Zod | 3.23.8 |
+| Validation | Zod | 4.6.7 |
 | AI | OpenAI API (adapter pattern) | — |
 | File Storage | Cloudflare R2 (S3-compatible) | — |
 | Background Jobs | PostgreSQL-backed job queue | — |

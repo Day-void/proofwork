@@ -7,6 +7,8 @@ const envSchema = z.object({
   // Authentication
   BETTER_AUTH_SECRET: z.string().min(32).optional(),
   BETTER_AUTH_URL: z.url().default('http://localhost:3000'),
+  RESEND_API_KEY: z.string().optional(),
+  AUTH_EMAIL_FROM: z.string().optional(),
 
   // OpenAI
   OPENAI_API_KEY: z.string().optional(),

@@ -1,20 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-});
 
 export const metadata: Metadata = {
   title: {
-    default: 'ProofWork — Verified Skills Assessment',
+    default: 'ProofWork — Make your work count',
     template: '%s | ProofWork',
   },
   description:
-    'Bridge the gap between having skills and proving them. Submit real projects, receive AI-assisted and human-verified assessments, and share verified skill reports.',
+    'Turn real projects into trusted proof of what you can do. Get thoughtful human assessment, backed by AI and grounded in your actual work.',
   keywords: ['skills verification', 'assessment', 'web development', 'portfolio', 'proof of work'],
   authors: [{ name: 'ProofWork' }],
   openGraph: {
@@ -33,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body className="min-h-screen font-sans antialiased">
         {children}
       </body>
