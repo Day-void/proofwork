@@ -66,19 +66,23 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Learner profiles | ⬜ | |
-| Project creation | ⬜ | |
-| Submission forms | ⬜ | |
-| Evidence uploads | ⬜ | |
-| Submission versioning | ⬜ | |
+| Learner profiles | ✅ | Learner-owned headline, bio, and portfolio URL stored in Neon |
+| Project creation | ✅ | Owner-scoped projects with skill area and summary |
+| Submission forms | ✅ | Create drafts, save project narrative, record consent and submit |
+| Evidence links | ✅ | Learners can attach project, repository, and demo URLs to a draft |
+| Evidence uploads | 🚫 | R2 credentials are not configured; upload integration remains to be implemented after storage setup |
+| Submission versioning | ✅ | Submitted versions are immutable; a new draft starts the next version |
+| Submission status | ✅ | Live dashboard counts and per-project draft/submitted states |
 
 ## Phase 4 — Assessment Engine
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Rubric management | ⬜ | |
+| Role catalog and competency definitions | 🔄 | Entry-level frontend developer rubric draft in `docs/product/FRONTEND_DEVELOPER_RUBRIC_DRAFT.md`; needs practitioner and employer calibration |
+| Role-specific challenge library | 🔄 | Community Workshop Finder challenge draft in `docs/product/FRONTEND_DEVELOPER_CHALLENGE_DRAFT.md`; not implemented |
+| Versioned rubric management | ⬜ | |
 | Assessor assignment | ⬜ | |
-| Independent assessments | ⬜ | |
+| Independent evidence-based assessments | ⬜ | Portfolio and role challenge evidence should be evaluated and attributed separately |
 | AI-assisted analysis | ⬜ | |
 | Background processing | ⬜ | |
 
@@ -98,6 +102,7 @@
 | User management | ⬜ | |
 | Audit logs | ⬜ | |
 | Platform settings | ⬜ | |
+| Employer profile discovery and report access | ⬜ | Learner opt-in and revocable sharing required |
 
 ## Phase 7 — Testing & Deployment
 

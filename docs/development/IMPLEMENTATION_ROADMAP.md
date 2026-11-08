@@ -50,22 +50,25 @@
 - [x] Integrate Resend password-reset email delivery
 - [ ] Configure production database, auth secret, and verified email sender
 
-## Phase 3 — Learner Submissions
+## Phase 3 — Learner Submissions (in progress)
 
-- [ ] Learner profile management
-- [ ] Project creation workflow
-- [ ] Multi-step submission form
-- [ ] File upload to Cloudflare R2 (presigned URLs)
-- [ ] Submission versioning (immutable snapshots)
-- [ ] Submission status tracking
-- [ ] Consent and integrity recording
+- [x] Learner profile management (headline, bio, portfolio URL)
+- [x] Project creation workflow backed by Neon
+- [x] Multi-step submission flow (project setup, then versioned evidence and narrative)
+- [ ] File upload to Cloudflare R2 (presigned URLs; R2 credentials and SDK install are pending)
+- [x] Submission versioning (submitted snapshots are immutable; revisions start a new version)
+- [x] Submission status tracking (draft and submitted)
+- [x] Consent and integrity recording at submit time
 
-## Phase 4 — Assessment Engine
+## Phase 4 — Assessment Engine (design underway; runtime implementation not started)
 
-- [ ] Rubric CRUD with versioning
+- [ ] Role catalog and competency definitions
+- [ ] Role-specific rubric design with behavioral rating anchors and versioning
+- [ ] Shared role challenge library (ProofWork-authored and reviewed employer briefs)
 - [ ] Assessor assignment system
+- [ ] Assessor conflict-of-interest disclosure and calibration workflow
 - [ ] Independent assessment interface
-- [ ] Criterion-level evaluation form
+- [ ] Competency-level evaluation tied to portfolio and challenge evidence
 - [ ] AI analysis integration (OpenAI structured outputs)
 - [ ] Background job processing for AI evaluation
 - [ ] Assessment save, preview, and submit workflow
@@ -75,12 +78,13 @@
 - [ ] Moderation trigger (disagreement threshold detection)
 - [ ] Moderator review interface
 - [ ] Final human approval workflow
-- [ ] Skill report generation
+- [ ] Learner appeal and reassessment workflow
+- [ ] Skill reports with competency ratings, assessor reasoning, evidence references, date, and rubric version
 - [ ] Unique verification identifiers (cryptographic tokens)
 - [ ] Public verification endpoint
 - [ ] Report revocation mechanism
 
-## Phase 6 — Administration
+## Phase 6 — Administration & Employer Access
 
 - [ ] Admin dashboard with platform statistics
 - [ ] User management (CRUD, role assignment, status toggling)
@@ -88,6 +92,9 @@
 - [ ] Rubric management interface
 - [ ] Audit log viewer
 - [ ] Platform settings
+- [ ] Employer access to learner-opted-in discoverable profiles
+- [ ] Private report sharing and employer report verification view
+- [ ] Learner visibility controls and access revocation
 
 ## Phase 7 — Testing & Deployment
 

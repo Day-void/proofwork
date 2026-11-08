@@ -6,7 +6,7 @@ ProofWork bridges the gap between having practical skills and being able to demo
 
 ## Status
 
-**Phase 2 — Authentication & Database** (in progress)
+**Phase 3 — Learner Submissions** (in progress; file uploads await Cloudflare R2 setup)
 
 ## Tech Stack
 
