@@ -60,8 +60,9 @@
 - [x] Submission status tracking (draft and submitted)
 - [x] Consent and integrity recording at submit time
 
-## Phase 4 — Assessment Engine (design underway; runtime implementation not started)
+## Phase 4 — Assessment Engine (data foundation implemented; workflows in progress)
 
+- [x] Add versioned role, rubric, challenge, verification request, assessor review, and competency rating tables to Neon
 - [ ] Role catalog and competency definitions
 - [ ] Role-specific rubric design with behavioral rating anchors and versioning
 - [ ] Shared role challenge library (ProofWork-authored and reviewed employer briefs)

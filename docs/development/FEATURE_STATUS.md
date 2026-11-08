@@ -78,9 +78,9 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Role catalog and competency definitions | 🔄 | Entry-level frontend developer rubric draft in `docs/product/FRONTEND_DEVELOPER_RUBRIC_DRAFT.md`; needs practitioner and employer calibration |
-| Role-specific challenge library | 🔄 | Community Workshop Finder challenge draft in `docs/product/FRONTEND_DEVELOPER_CHALLENGE_DRAFT.md`; not implemented |
-| Versioned rubric management | ⬜ | |
+| Role catalog and competency definitions | 🔄 | Data model is in Neon; entry-level frontend developer rubric draft in `docs/product/FRONTEND_DEVELOPER_RUBRIC_DRAFT.md` needs practitioner and employer calibration |
+| Role-specific challenge library | 🔄 | Versioned challenge schema is in Neon; Community Workshop Finder draft in `docs/product/FRONTEND_DEVELOPER_CHALLENGE_DRAFT.md` is not yet published |
+| Versioned rubric management | 🔄 | Rubric versions and criterion-level rating anchors are represented in the schema; management UI is pending |
 | Assessor assignment | ⬜ | |
 | Independent evidence-based assessments | ⬜ | Portfolio and role challenge evidence should be evaluated and attributed separately |
 | AI-assisted analysis | ⬜ | |
