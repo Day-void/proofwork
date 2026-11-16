@@ -34,6 +34,7 @@ const nav: Record<DashboardKind, { label: string; href: string; icon: LucideIcon
   ],
   admin: [
     { label: "Overview", href: "/admin", icon: LayoutDashboard },
+    { label: "Assessment roles", href: "/admin/roles", icon: BookOpenCheck },
     { label: "Users", href: "/admin#users", icon: Users },
     { label: "Platform health", href: "/admin#health", icon: Activity },
   ],
@@ -75,7 +76,7 @@ const details: Record<DashboardKind, {
     eyebrow: "Administration",
     title: "A clear view of the platform.",
     subtitle: "Monitor activity and keep the assessment experience consistent for everyone.",
-    primary: "Manage users",
+    primary: "Manage assessment roles",
     metrics: [
       { label: "Active learners", value: "—", note: "Platform metrics will appear here", icon: Users },
       { label: "Reviews underway", value: "—", note: "Current assessment activity", icon: BookOpenCheck },
@@ -87,7 +88,7 @@ const details: Record<DashboardKind, {
 
 export function DashboardShell({ kind }: { kind: DashboardKind }) {
   const data = details[kind];
-  const ctaHref = kind === "learner" ? "/#how-it-works" : kind === "assessor" ? "/assessor#guidelines" : "/admin#users";
+  const ctaHref = kind === "learner" ? "/#how-it-works" : kind === "assessor" ? "/assessor#guidelines" : "/admin/roles";
   const listId = kind === "learner" ? "projects" : kind === "assessor" ? "queue" : "users";
 
   return (

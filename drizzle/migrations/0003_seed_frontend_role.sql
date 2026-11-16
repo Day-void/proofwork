@@ -1,0 +1,28 @@
+INSERT INTO "assessment_role" ("id", "slug", "title", "target_level", "description", "active")
+VALUES ('role-frontend-developer', 'frontend-developer', 'Frontend Developer', 'Entry level', 'Builds and maintains accessible, responsive web interfaces and explains practical implementation decisions.', false)
+ON CONFLICT ("slug") DO NOTHING;
+--> statement-breakpoint
+INSERT INTO "rubric_version" ("id", "role_id", "version", "title", "status")
+VALUES ('rubric-frontend-developer-v1', 'role-frontend-developer', 1, 'Frontend Developer · Entry Level', 'draft')
+ON CONFLICT ("role_id", "version") DO NOTHING;
+--> statement-breakpoint
+INSERT INTO "rubric_criterion" ("id", "rubric_version_id", "criterion_key", "title", "description", "evidence_guidance", "developing_anchor", "meets_anchor", "strong_anchor", "sort_order") VALUES
+('frontend-ui-v1', 'rubric-frontend-developer-v1', 'interface-implementation', 'Requirements and interface implementation', 'Turns the brief into a working interface with understandable hierarchy, appropriate components, and complete interactions.', 'Review the primary user path, required states, semantic structure, and behavior against the brief.', 'Completes part of the main path, but important requirements or states are incomplete.', 'Delivers the main path and required states; interactions behave predictably and the interface is understandable.', 'Covers less obvious states and details carefully; implementation remains coherent as requirements interact.', 1),
+('frontend-responsive-v1', 'rubric-frontend-developer-v1', 'responsive-layout', 'Responsive layout and visual behavior', 'Maintains usability and content hierarchy across the specified viewport sizes and input modes.', 'Inspect at the published widths for overflow, readability, usable controls, and layout transitions.', 'Works at one size but has significant layout or usability problems at other required sizes.', 'Works at all specified sizes with readable content and usable controls.', 'Handles layout transitions and dense or long content gracefully, with no major loss of hierarchy.', 2),
+('frontend-accessibility-v1', 'rubric-frontend-developer-v1', 'accessibility-fundamentals', 'Accessibility fundamentals', 'Makes the primary experience operable and understandable to people using keyboard and assistive technology.', 'Inspect semantic HTML, names and labels, focus order and visibility, keyboard operation, feedback, and contrast.', 'Relies on visual cues or pointer interaction in ways that block key tasks.', 'Primary tasks can be completed by keyboard; controls have appropriate semantics and names; key feedback is perceivable.', 'Applies accessibility consistently across states and proactively handles focus, errors, and non-visual context.', 3),
+('frontend-code-quality-v1', 'rubric-frontend-developer-v1', 'code-structure', 'Code structure and maintainability', 'Organizes implementation so another developer can understand and safely change it.', 'Review component boundaries, reuse, naming, duplication, state and data flow, and abstraction choices.', 'Structure makes changes difficult, with avoidable duplication or tangled responsibilities.', 'Structure is understandable; related behavior is grouped sensibly; abstractions fit the task.', 'Keeps the solution simple while making repeated or evolving behavior easy to extend and review.', 4),
+('frontend-reasoning-v1', 'rubric-frontend-developer-v1', 'technical-reasoning', 'Technical reasoning and problem solving', 'Interprets the task, makes implementation choices, and investigates problems.', 'Review the decision log, trade-offs, assumptions, and explanation of a concrete issue or correction.', 'Has difficulty explaining key choices or resolving a demonstrated issue without substantial prompting.', 'Explains the main decisions, identifies a reasonable approach, and can investigate and fix a concrete issue.', 'Compares viable approaches, explains consequences, and adapts when evidence shows the first approach is not working.', 5),
+('frontend-testing-v1', 'rubric-frontend-developer-v1', 'testing-reliability', 'Testing and reliability', 'Checks important behavior and responds appropriately to invalid or unexpected input.', 'Review checks for primary behavior, relevant edge cases, empty and error states, and repeatable regression checks.', 'Checks only the happy path or leaves important failures unhandled.', 'Checks the primary flow and relevant edge cases; failure states are understandable and do not silently corrupt behavior.', 'Chooses focused checks that catch regressions and covers important boundary conditions without unnecessary test complexity.', 6)
+ON CONFLICT ("rubric_version_id", "criterion_key") DO NOTHING;
+--> statement-breakpoint
+INSERT INTO "role_challenge" ("id", "role_id", "version", "title", "brief", "acceptance_criteria", "status")
+VALUES (
+  'challenge-workshop-finder-v1',
+  'role-frontend-developer',
+  1,
+  'Community Workshop Finder',
+  'Build a small responsive Community Workshop Finder using supplied fictional workshop data. Visitors should browse workshops, search titles, combine topic and skill-level filters, open details without losing their filters, and recover from no matching results. The task must be a fictional practice task and must not produce usable unpaid employer work.',
+  'Use supplied 8–12 item fixture; case-insensitive title search; combined topic and skill filters; accessible details view with focus return; clear no-results state and reset; usable at 360px, 768px, and 1280px; README with run instructions, checks performed, one trade-off, and one possible improvement. Framework choice is not scored.',
+  'draft'
+)
+ON CONFLICT ("role_id", "version") DO NOTHING;
