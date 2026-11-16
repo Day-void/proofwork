@@ -1,6 +1,6 @@
 # Security Model
 
-*Last updated: 2026-11-06*
+*Last updated: 2026-11-16*
 
 ## Authentication
 
@@ -15,14 +15,18 @@
 ## Authorization
 
 - **Model:** Role-Based Access Control (RBAC)
-- **Roles:** Learner, Assessor, Administrator
+- **Roles:** Learner, Assessor, Moderator, Administrator, Employer
 - **Enforcement:** Server-side policy checks on every request
 - **Principle:** Never trust client-submitted role information
 
 ## Data Protection
 
 - Environment variables never exposed to the client
-- Signed, expiring URLs for private file access (R2)
+- Private R2 uploads are signed for the learner's own prefix; signed download URLs are issued only to the owner, an assigned conflict-cleared assessor, or an administrator/moderator.
+- R2 upload signatures bind file type and content length, expire quickly, and accept only an allowlisted MIME type and maximum 10 MB.
+- Report links use random bearer tokens; only SHA-256 hashes are stored. Learners can revoke links; moderators/admins can revoke a report.
+- Employer discovery requires platform enablement plus learner-level and report-level opt-in. Email, submission content, and assessor notes are excluded from the directory.
+- AI analysis is disabled by default and requires separate learner consent per request. Project text is sent without account names or URLs; output is advisory and cannot decide outcomes.
 - Input validation on all endpoints (Zod)
 - IDOR protection via resource-level permission checks
 
@@ -37,5 +41,5 @@
 
 - Immutable submission versions
 - Independent assessor evaluations (no cross-contamination)
-- Append-only audit trails
+- Append-only audit trails for role/access changes, report decisions, calibration, and sharing changes
 - Report revocation capability

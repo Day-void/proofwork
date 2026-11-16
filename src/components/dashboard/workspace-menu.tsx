@@ -10,9 +10,10 @@ const workspaces = [
   { role: "assessor", href: "/assessor", label: "Assessor" },
   { role: "moderator", href: "/assessor", label: "Moderator" },
   { role: "admin", href: "/admin", label: "Admin" },
+  { role: "employer", href: "/employer", label: "Employer" },
 ];
 
-export function WorkspaceMenu({ kind }: { kind: "learner" | "assessor" | "admin" }) {
+export function WorkspaceMenu({ kind }: { kind: "learner" | "assessor" | "admin" | "employer" }) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
   const user = session?.user;

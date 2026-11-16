@@ -40,14 +40,17 @@ export async function saveLearnerProfile(formData: FormData) {
     headline: z.string().trim().max(100),
     bio: z.string().trim().max(1000),
     portfolioUrl: z.union([z.literal(""), z.string().url().max(500)]),
+    discoverable: z.boolean(),
   }).parse({
     headline: formData.get("headline"),
     bio: formData.get("bio"),
     portfolioUrl: formData.get("portfolioUrl"),
+    discoverable: formData.get("discoverable") === "on",
   });
   await database.insert(learnerProfile).values({ id: crypto.randomUUID(), userId: session.user.id, ...values })
     .onConflictDoUpdate({ target: learnerProfile.userId, set: { ...values, updatedAt: new Date() } });
   revalidatePath("/dashboard/profile");
+  revalidatePath("/employer");
   redirect("/dashboard/profile?saved=1");
 }
 
@@ -122,6 +125,24 @@ export async function addEvidenceLink(formData: FormData) {
   if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") throw new Error("Evidence links must use HTTP or HTTPS.");
   await requireDatabase().insert(submissionEvidence).values({
     id: crypto.randomUUID(), submissionId, kind: "link", ...values,
+  });
+  revalidatePath(`/dashboard/projects/${submission.projectId}`);
+  redirect(`/dashboard/projects/${submission.projectId}`);
+}
+
+export async function attachEvidenceFile(formData: FormData) {
+  const session = await requireRole(["learner"]);
+  const submissionId = z.string().uuid().parse(formData.get("submissionId"));
+  const { submission } = await ownedDraft(submissionId, session.user.id);
+  const values = z.object({
+    title: z.string().trim().min(2).max(100),
+    objectKey: z.string().min(1).max(500),
+    contentType: z.enum(["application/pdf", "image/jpeg", "image/png", "image/webp", "text/plain"]),
+    byteSize: z.coerce.number().int().positive().max(10 * 1024 * 1024),
+  }).parse({ title: formData.get("title"), objectKey: formData.get("objectKey"), contentType: formData.get("contentType"), byteSize: formData.get("byteSize") });
+  if (!values.objectKey.startsWith(`proofwork/${session.user.id}/`) || values.objectKey.includes("..")) throw new Error("The uploaded file key is not valid for this account.");
+  await requireDatabase().insert(submissionEvidence).values({
+    id: crypto.randomUUID(), submissionId, kind: "file", ...values,
   });
   revalidatePath(`/dashboard/projects/${submission.projectId}`);
   redirect(`/dashboard/projects/${submission.projectId}`);

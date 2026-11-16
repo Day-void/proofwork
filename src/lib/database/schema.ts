@@ -9,7 +9,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const userRoles = ["learner", "assessor", "moderator", "admin"] as const;
+export const userRoles = ["learner", "assessor", "moderator", "admin", "employer"] as const;
 export type UserRole = (typeof userRoles)[number];
 
 export const user = pgTable("user", {
@@ -19,6 +19,7 @@ export const user = pgTable("user", {
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
   role: text("role").$type<UserRole>().notNull().default("learner"),
+  disabled: boolean("disabled").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [uniqueIndex("user_email_unique").on(table.email)]);
@@ -70,6 +71,7 @@ export const learnerProfile = pgTable("learner_profile", {
   headline: text("headline"),
   bio: text("bio"),
   portfolioUrl: text("portfolio_url"),
+  discoverable: boolean("discoverable").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [uniqueIndex("learner_profile_user_unique").on(table.userId)]);
@@ -203,7 +205,9 @@ export const verificationRequest = pgTable("verification_request", {
   challengeSubmissionId: text("challenge_submission_id").notNull().references(() => challengeSubmission.id, { onDelete: "restrict" }),
   status: text("status").$type<"submitted" | "in_review" | "moderation" | "approved" | "needs_more_evidence" | "appealed" | "rejected" | "revoked">().notNull().default("submitted"),
   discoverable: boolean("discoverable").notNull().default(false),
+  aiAnalysisConsent: boolean("ai_analysis_consent").notNull().default(false),
   verificationTokenHash: text("verification_token_hash"),
+  decisionNote: text("decision_note"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   completedAt: timestamp("completed_at", { withTimezone: true }),
 }, (table) => [
@@ -251,6 +255,46 @@ export const assessorCalibration = pgTable("assessor_calibration", {
   index("assessor_calibration_rubric_status_idx").on(table.rubricVersionId, table.status),
 ]);
 
+export const verificationShare = pgTable("verification_share", {
+  id: text("id").primaryKey(),
+  requestId: text("request_id").notNull().references(() => verificationRequest.id, { onDelete: "cascade" }),
+  createdBy: text("created_by").notNull().references(() => user.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("verification_share_token_hash_unique").on(table.tokenHash),
+  index("verification_share_request_idx").on(table.requestId),
+]);
+
+export const auditLog = pgTable("audit_log", {
+  id: text("id").primaryKey(),
+  actorId: text("actor_id").references(() => user.id, { onDelete: "set null" }),
+  action: text("action").notNull(),
+  targetType: text("target_type").notNull(),
+  targetId: text("target_id").notNull(),
+  details: jsonb("details").$type<Record<string, string | number | boolean | null>>().notNull().default({}),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [index("audit_log_created_idx").on(table.createdAt), index("audit_log_target_idx").on(table.targetType, table.targetId)]);
+
+export const platformSetting = pgTable("platform_setting", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedBy: text("updated_by").references(() => user.id, { onDelete: "set null" }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const aiAnalysisJob = pgTable("ai_analysis_job", {
+  id: text("id").primaryKey(),
+  requestId: text("request_id").notNull().references(() => verificationRequest.id, { onDelete: "cascade" }),
+  status: text("status").$type<"queued" | "running" | "completed" | "failed">().notNull().default("queued"),
+  attempts: integer("attempts").notNull().default(0),
+  result: jsonb("result").$type<Record<string, unknown>>(),
+  lastError: text("last_error"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [index("ai_analysis_job_status_created_idx").on(table.status, table.createdAt), index("ai_analysis_job_request_idx").on(table.requestId)]);
+
 export const competencyRating = pgTable("competency_rating", {
   id: text("id").primaryKey(),
   reviewId: text("review_id").notNull().references(() => assessorReview.id, { onDelete: "cascade" }),
@@ -281,4 +325,8 @@ export const databaseSchema = {
   assessorReview,
   assessorCalibration,
   competencyRating,
+  verificationShare,
+  auditLog,
+  platformSetting,
+  aiAnalysisJob,
 };

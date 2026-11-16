@@ -12,6 +12,8 @@ const envSchema = z.object({
 
   // OpenAI
   OPENAI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().default('gpt-4.1-mini'),
+  CRON_SECRET: z.string().min(32).optional(),
 
   // Cloudflare R2
   R2_ACCOUNT_ID: z.string().optional(),

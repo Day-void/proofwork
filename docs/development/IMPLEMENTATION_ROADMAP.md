@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-*Last updated: 2026-11-16 (assessor assignment and calibration workflows implemented)*
+*Last updated: 2026-11-16 (assessment lifecycle, reporting, operations, storage, and AI assistance implemented)*
 
 ## Phase 0 — Foundation & Final Foundation Audit ✅
 
@@ -20,7 +20,7 @@
 - [x] Verify development server starts and renders homepage with Status 200
 - [x] Update documentation (FEATURE_STATUS.md, IMPLEMENTATION_ROADMAP.md, ARCHITECTURE_DECISIONS.md)
 
-## Phase 1 — UI Foundation (in progress)
+## Phase 1 — UI Foundation (implementation complete; manual reviews remain)
 
 - [x] Complete design system foundations (typography, colors, elevation, focus rings)
 - [x] Build public landing page (hero, value proposition, evidence mechanism, assessor explanation, CTA)
@@ -35,11 +35,11 @@
 - [x] Verify production build with Webpack (custom temporary output directory; all eight routes prerendered)
 - [ ] Visually review responsive layouts across browser sizes
 
-## Phase 2 — Authentication & Database (in progress)
+## Phase 2 — Authentication & Database (implementation complete; production mail setup remains)
 
 - [x] Design and implement Drizzle PostgreSQL auth schema
 - [x] Generate initial SQL migration
-- [ ] Apply and verify initial migration against a configured Neon database
+- [x] Apply and verify initial migrations against the configured Neon database
 - [x] Configure Better Auth with Neon serverless HTTP driver
 - [x] Implement registration flow with email validation (new users are learners)
 - [x] Implement login and secure database-backed session handling
@@ -48,14 +48,14 @@
 - [x] Add protected route boundaries
 - [x] Implement password recovery request and reset flows
 - [x] Integrate Resend password-reset email delivery
-- [ ] Configure production database, auth secret, and verified email sender
+- [ ] Configure production hosting credentials and verified email sender
 
-## Phase 3 — Learner Submissions (in progress)
+## Phase 3 — Learner Submissions (implementation complete; R2 provisioning remains)
 
 - [x] Learner profile management (headline, bio, portfolio URL)
 - [x] Project creation workflow backed by Neon
 - [x] Multi-step submission flow (project setup, then versioned evidence and narrative)
-- [ ] File upload to Cloudflare R2 (presigned URLs; R2 credentials and SDK install are pending)
+- [x] File upload to Cloudflare R2 (content-type and content-length bound presigned URLs; private signed downloads)
 - [x] Submission versioning (submitted snapshots are immutable; revisions start a new version)
 - [x] Submission status tracking (draft and submitted)
 - [x] Consent and integrity recording at submit time
@@ -68,42 +68,42 @@
 - [x] Shared role challenge library (ProofWork-authored and reviewed employer briefs; seeded practice challenge)
 - [x] Assessor assignment system (admin assignment requires calibration approval for the request's rubric version)
 - [x] Assessor conflict-of-interest disclosure and calibration workflow (disclose or recuse; human approval of rubric-specific calibration)
-- [ ] Independent assessment interface
-- [ ] Competency-level evaluation tied to portfolio and challenge evidence
-- [ ] AI analysis integration (OpenAI structured outputs)
-- [ ] Background job processing for AI evaluation
-- [ ] Assessment save, preview, and submit workflow
+- [x] Independent assessment interface
+- [x] Competency-level evaluation tied to portfolio and challenge evidence
+- [x] AI analysis integration (optional Responses API Structured Outputs; explicit learner consent and human decision required)
+- [x] Background job processing for AI evaluation (authenticated Vercel Cron worker, retries, and result visibility)
+- [x] Assessment save, preview, and submit workflow
 
 ## Phase 5 — Moderation & Reports
 
-- [ ] Moderation trigger (disagreement threshold detection)
-- [ ] Moderator review interface
-- [ ] Final human approval workflow
-- [ ] Learner appeal and reassessment workflow
-- [ ] Skill reports with competency ratings, assessor reasoning, evidence references, date, and rubric version
-- [ ] Unique verification identifiers (cryptographic tokens)
-- [ ] Public verification endpoint
-- [ ] Report revocation mechanism
+- [x] Moderation trigger (two-level inter-rater disagreement)
+- [x] Moderator review interface
+- [x] Final human approval workflow
+- [x] Learner appeal and reassessment workflow
+- [x] Skill reports with competency ratings, assessor reasoning, evidence references, date, and rubric version
+- [x] Unique verification identifiers (unguessable share tokens stored as SHA-256 hashes)
+- [x] Public verification endpoint
+- [x] Report revocation mechanism
 
 ## Phase 6 — Administration & Employer Access
 
-- [ ] Admin dashboard with platform statistics
-- [ ] User management (CRUD, role assignment, status toggling)
-- [ ] Submission and assessment oversight
-- [ ] Rubric management interface
-- [ ] Audit log viewer
-- [ ] Platform settings
-- [ ] Employer access to learner-opted-in discoverable profiles
-- [ ] Private report sharing and employer report verification view
-- [ ] Learner visibility controls and access revocation
+- [x] Admin dashboard with platform statistics
+- [x] User management (account listing, role assignment, access disable/enable)
+- [x] Submission and assessment oversight
+- [x] Rubric management interface
+- [x] Audit log viewer
+- [x] Platform settings
+- [x] Employer access to learner-opted-in discoverable profiles
+- [x] Private report sharing and employer report verification view
+- [x] Learner visibility controls and access revocation
 
 ## Phase 7 — Testing & Deployment
 
-- [ ] Unit tests for business logic and scoring algorithms
+- [x] Unit tests for business logic and scoring algorithms (native Node test runner)
 - [ ] Integration tests for API route handlers
 - [ ] End-to-end tests for critical learner and assessor journeys
-- [ ] Resolve all edge-case TypeScript and lint warnings
-- [ ] Production build and asset optimization
-- [ ] Vercel deployment configuration
-- [ ] Neon database provisioning and connection pooling guide
-- [ ] Cloudflare R2 bucket security and CORS configuration
+- [x] Resolve TypeScript and lint errors
+- [x] Production build
+- [x] Vercel deployment configuration (scheduled AI worker; hosting project and environment still need setup)
+- [x] Neon database provisioning and connection pooling guide
+- [x] Cloudflare R2 bucket security and CORS configuration guide

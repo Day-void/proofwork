@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
+    "test:unit": "node --experimental-strip-types --test tests/assessment-scoring.test.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"

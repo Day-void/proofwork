@@ -1,0 +1,1 @@
+ALTER TABLE "verification_request" ADD COLUMN "ai_analysis_consent" boolean DEFAULT false NOT NULL;

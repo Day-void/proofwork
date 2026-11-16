@@ -1,17 +1,24 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod/v4";
+import { requiresModeration } from "@/features/assessment/scoring";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
 import {
   assessorCalibration,
   assessorReview,
+  aiAnalysisJob,
   assessmentRole,
+  challengeEvidence,
+  challengeSubmission,
+  competencyRating,
   rubricCriterion,
   rubricVersion,
+  platformSetting,
+  submissionEvidence,
   user,
   verificationRequest,
   type CalibrationAnswer,
@@ -134,4 +141,80 @@ export async function reviewCalibration(formData: FormData) {
   revalidatePath("/admin/assessments");
   revalidatePath("/assessor");
   redirect("/admin/assessments?calibrationReviewed=1");
+}
+
+async function saveReview(formData: FormData, submit: boolean) {
+  const session = await requireRole(["assessor"]);
+  const reviewId = z.string().min(1).max(100).parse(formData.get("reviewId"));
+  const store = database();
+  const [review] = await store.select({ review: assessorReview, request: verificationRequest })
+    .from(assessorReview).innerJoin(verificationRequest, eq(assessorReview.requestId, verificationRequest.id))
+    .where(and(eq(assessorReview.id, reviewId), eq(assessorReview.assessorId, session.user.id), eq(assessorReview.status, "in_progress"), eq(assessorReview.conflictStatus, "cleared")))
+    .limit(1);
+  if (!review) throw new Error("This review is unavailable or your conflict disclosure is not cleared.");
+  const criteria = await store.select().from(rubricCriterion).where(eq(rubricCriterion.rubricVersionId, review.request.rubricVersionId));
+  if (!criteria.length) throw new Error("The review rubric has no criteria.");
+  const portfolio = await store.select({ id: submissionEvidence.id }).from(submissionEvidence)
+    .where(eq(submissionEvidence.submissionId, review.request.portfolioSubmissionId));
+  const challenge = await store.select({ id: challengeEvidence.id }).from(challengeEvidence)
+    .where(eq(challengeEvidence.challengeSubmissionId, review.request.challengeSubmissionId));
+  const [challengeWork] = await store.select({ sourceUrl: challengeSubmission.sourceUrl, demoUrl: challengeSubmission.demoUrl })
+    .from(challengeSubmission).where(eq(challengeSubmission.id, review.request.challengeSubmissionId)).limit(1);
+  const allowedReferences = new Set([
+    "portfolio:narrative", ...portfolio.map((item) => `portfolio:${item.id}`),
+    "challenge:response", ...challenge.map((item) => `challenge:${item.id}`),
+    ...(challengeWork?.sourceUrl ? ["challenge:source"] : []),
+    ...(challengeWork?.demoUrl ? ["challenge:demo"] : []),
+  ]);
+  const ratingSchema = z.enum(["not_yet_demonstrated", "developing", "meets_expectations", "strong", "insufficient_evidence"]);
+  const updates = [];
+  for (const criterion of criteria) {
+    const rawRating = formData.get(`rating:${criterion.id}`);
+    const rawRationale = formData.get(`rationale:${criterion.id}`);
+    const rawReference = formData.get(`evidence:${criterion.id}`);
+    if (!submit && (!rawRating || !rawRationale || !rawReference)) continue;
+    const rating = ratingSchema.parse(rawRating);
+    const rationale = z.string().trim().min(20).max(2000).parse(rawRationale);
+    const evidenceReference = z.string().min(3).max(200).parse(rawReference);
+    if (!allowedReferences.has(evidenceReference)) throw new Error("Choose evidence attached to this verification request.");
+    updates.push({
+      id: crypto.randomUUID(), reviewId, criterionId: criterion.id, rating, rationale, evidenceReference, updatedAt: new Date(),
+    });
+  }
+  if (submit && updates.length !== criteria.length) throw new Error("Complete every rubric criterion before submitting the review.");
+  for (const update of updates) {
+    await store.insert(competencyRating).values(update).onConflictDoUpdate({
+      target: [competencyRating.reviewId, competencyRating.criterionId],
+      set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
+    });
+  }
+  if (!submit) {
+    revalidatePath(`/assessor/reviews/${reviewId}`);
+    redirect(`/assessor/reviews/${reviewId}?saved=1`);
+  }
+  await store.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
+  const otherReviews = await store.select({ id: assessorReview.id }).from(assessorReview).where(and(
+    eq(assessorReview.requestId, review.request.id), eq(assessorReview.status, "submitted"),
+  ));
+  const [job] = await store.select({ id: aiAnalysisJob.id }).from(aiAnalysisJob).where(eq(aiAnalysisJob.requestId, review.request.id)).limit(1);
+  const [request] = await store.select({ consent: verificationRequest.aiAnalysisConsent }).from(verificationRequest).where(eq(verificationRequest.id, review.request.id)).limit(1);
+  const [aiEnabled] = await store.select({ value: platformSetting.value }).from(platformSetting).where(eq(platformSetting.key, "ai_analysis_enabled")).limit(1);
+  if (!job && request?.consent && aiEnabled?.value === "true") await store.insert(aiAnalysisJob).values({ id: crypto.randomUUID(), requestId: review.request.id, status: "queued" });
+  if (otherReviews.length >= 2) {
+    const submittedIds = otherReviews.map(({ id }) => id);
+    const ratings = await store.select().from(competencyRating).where(inArray(competencyRating.reviewId, submittedIds));
+    const disagreement = requiresModeration(ratings.map((rating) => ({ reviewId: rating.reviewId, criterionId: rating.criterionId, rating: rating.rating })));
+    if (disagreement) await store.update(verificationRequest).set({ status: "moderation" }).where(eq(verificationRequest.id, review.request.id));
+  }
+  revalidatePath("/assessor");
+  revalidatePath("/admin/assessments");
+  redirect("/assessor?reviewSubmitted=1");
+}
+
+export async function saveAssessmentDraft(formData: FormData) {
+  await saveReview(formData, false);
+}
+
+export async function submitAssessmentReview(formData: FormData) {
+  await saveReview(formData, true);
 }

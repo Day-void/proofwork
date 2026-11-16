@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-16 (assessor assignment and calibration workflows implemented)*
+*Last updated: 2026-11-16 (end-to-end assessment and reporting workflows implemented)*
 
 ## Legend
 
@@ -45,7 +45,7 @@
 | Admin dashboard shell | ✅ | User and platform health sections |
 | Keyboard and screen-reader foundations | 🔄 | Landmarks, labels, native disclosure menus, and visible focus styles are in place; manual assistive-technology review remains |
 | Visual assets | ✅ | Lucide icons and a CSS-generated product report preview; no external asset dependency |
-| Production build | ✅ | Webpack build passed after the final shell revision; all eight routes prerendered using an isolated output directory |
+| Production build | ✅ | `npm run build` passed with the application routes and server handlers |
 
 ## Phase 2 — Authentication & Database
 
@@ -60,7 +60,7 @@
 | RBAC | ✅ | Learner, assessor, moderator, and admin roles enforced server-side |
 | Protected routes | ✅ | Workspace pages require the matching authenticated role |
 | Password recovery | ✅ | One-hour reset token, generic request response, Resend delivery, and rate limits |
-| Runtime credentials | 🔄 | Ignored `.env.local` now has a generated development secret and local URLs; Neon URL and Resend key/sender still need configuration |
+| Runtime credentials | 🔄 | Local Neon and auth credentials are configured. Resend key/sender, R2 credentials, OpenAI key, and cron secret are not configured. |
 
 ## Phase 3 — Learner Submissions
 
@@ -70,7 +70,7 @@
 | Project creation | ✅ | Owner-scoped projects with skill area and summary |
 | Submission forms | ✅ | Create drafts, save project narrative, record consent and submit |
 | Evidence links | ✅ | Learners can attach project, repository, and demo URLs to a draft |
-| Evidence uploads | 🚫 | R2 credentials are not configured; upload integration remains to be implemented after storage setup |
+| Evidence uploads | 🔄 | Private R2 presigned uploads/downloads are implemented and constrained by MIME type and file length; R2 credentials and bucket CORS still need setup |
 | Submission versioning | ✅ | Submitted versions are immutable; a new draft starts the next version |
 | Submission status | ✅ | Live dashboard counts and per-project draft/submitted states |
 
@@ -83,37 +83,41 @@
 | Versioned rubric management | ✅ | Admin UI edits draft criteria and anchors and publishes rubric versions |
 | Assessor assignment | ✅ | Admin assigns only assessors approved for the request's exact rubric version; self-review is blocked |
 | Conflict disclosure and calibration | ✅ | Assessors clear or recuse before reviewing; calibration is version-specific and approved by admin/moderator |
-| Independent evidence-based assessments | ⬜ | Portfolio and role challenge evidence should be evaluated and attributed separately |
-| AI-assisted analysis | ⬜ | |
-| Background processing | ⬜ | |
+| Learner challenge and verification request | ✅ | Learners submit a versioned role challenge and pair it with a portfolio version; employer discovery and AI analysis are explicit opt-ins |
+| Independent evidence-based assessments | ✅ | Assessor rating per competency cites portfolio or challenge evidence; drafts can be saved and submitted |
+| AI-assisted analysis | 🔄 | Structured Responses API worker is implemented and gated by learner consent and an admin setting; OpenAI credentials remain missing |
+| Background processing | ✅ | Authenticated worker route, five-minute Vercel Cron schedule, and bounded retry handling |
+| Disagreement moderation | ✅ | Two-level disagreement threshold flags requests; moderator/admin makes the final decision |
 
 ## Phase 5 — Moderation & Reports
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Moderation workflow | ⬜ | |
-| Report generation | ⬜ | |
-| Public verification | ⬜ | |
-| Report revocation | ⬜ | |
+| Moderation workflow | ✅ | Decision queue includes independent ratings and advisory AI output |
+| Report generation | ✅ | Learner report preserves rubric version, assessor ratings, rationale, evidence references, and date |
+| Public verification | ✅ | Learner-created bearer links use random tokens stored only as SHA-256 hashes |
+| Report revocation | ✅ | Learners can revoke share links; admins/moderators can revoke an approved report |
 
 ## Phase 6 — Administration
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Assessment operations | 🔄 | Admin assessment page handles calibration review and assessor assignment; user management, audit logs, and platform settings remain |
-| User management | ⬜ | |
-| Audit logs | ⬜ | |
-| Platform settings | ⬜ | |
-| Employer profile discovery and report access | ⬜ | Learner opt-in and revocable sharing required |
+| Admin dashboard and assessment operations | ✅ | Live learner/review/report counts, assignment, moderation, and calibration review |
+| User management | ✅ | User listing, role assignment, disable/enable with session revocation; changes are audited |
+| Audit logs | ✅ | Recent 200 administrative, moderation, access, and report-sharing events |
+| Platform settings | ✅ | New requests, employer discovery, and AI assistance default off and are admin-controlled |
+| Employer profile discovery and report access | ✅ | Employer role sees only learner-opted-in profiles and opted-in approved roles; private report links are independently revocable |
 
 ## Phase 7 — Testing & Deployment
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Unit tests | ⬜ | |
-| Integration tests | ⬜ | |
-| E2E tests | ⬜ | |
-| Deployment config | ⬜ | |
+| Unit tests | ✅ | Five native Node tests cover disagreement thresholds and duplicate-review handling |
+| Integration tests | ⬜ | Route/database integration harness is not configured |
+| E2E tests | ⬜ | Hosted auth/storage journeys need production-like credentials and browser runner setup |
+| Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass |
+| Production build | ✅ | `npm run build` passes |
+| Deployment config | 🔄 | `vercel.json` schedules the worker; Vercel project, domain, and encrypted environment variables remain to be configured |
 
 ## Known Security Advisories
 
@@ -128,3 +132,4 @@
 ## Technical Blockers
 
 - The in-app browser could not reach the local preview on either `localhost:3000` or `127.0.0.1:3000`, so responsive visual review remains pending.
+- Production email, Cloudflare R2, OpenAI, and cron credentials are not configured in `.env.local` or the current process environment.

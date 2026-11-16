@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { desc, eq, inArray } from "drizzle-orm";
-import { ArrowRight, BriefcaseBusiness, CircleUserRound, Plus } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, CircleUserRound, ClipboardCheck, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WorkspaceMenu } from "@/components/dashboard/workspace-menu";
@@ -34,6 +34,7 @@ export default async function LearnerDashboardPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <Link href="/" className="font-semibold tracking-tight">proofwork<span className="text-accent-600">.</span></Link>
           <nav aria-label="Learner account" className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="sm"><Link href="/dashboard/assessment"><ClipboardCheck className="mr-1.5 size-4" /> Assessments</Link></Button>
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/profile"><CircleUserRound className="mr-1.5 size-4" /> Profile</Link></Button>
             <Button asChild size="sm" className="bg-navy-900 text-white hover:bg-navy-800"><Link href="/dashboard/projects/new"><Plus className="mr-1 size-4" /> New project</Link></Button>
             <WorkspaceMenu kind="learner" />

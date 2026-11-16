@@ -17,9 +17,9 @@ ProofWork is a skills verification and assessment platform built as a **modular 
 | ORM | Drizzle ORM | 0.45.4 |
 | Authentication | Better Auth | 1.7.16 |
 | Validation | Zod | 4.6.7 |
-| AI | OpenAI API (adapter pattern) | — |
+| AI | OpenAI Responses API with Structured Outputs | Optional; gated by learner consent and platform setting |
 | File Storage | Cloudflare R2 (S3-compatible) | — |
-| Background Jobs | PostgreSQL-backed job queue | — |
+| Background Jobs | PostgreSQL-backed job queue + Vercel Cron | — |
 
 ## Architecture Diagram
 
@@ -67,3 +67,9 @@ public/         # Static assets
 4. **Better Auth**: Framework-agnostic auth with RBAC support.
 5. **AI as Assistant**: AI provides preliminary analysis; humans make final decisions.
 6. **Immutable Records**: Assessment history is append-only; no destructive updates.
+
+## Assessment lifecycle
+
+Learners pair a submitted portfolio version with a published role challenge. Each assessor must be calibrated for the exact rubric version and clear a conflict disclosure before reviewing. Ratings cite portfolio or challenge evidence. Large inter-rater differences queue moderation; only an admin or moderator can issue a final outcome. AI output is optional, consent-gated reviewer assistance and never a decision.
+
+Approved reports stay private until the learner creates a share link or opts the role into employer discovery. Share tokens are random, stored as hashes, and can be revoked. Private R2 evidence is accessed through short-lived signed URLs after ownership or assignment checks.

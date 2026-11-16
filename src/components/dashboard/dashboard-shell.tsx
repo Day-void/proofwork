@@ -36,7 +36,9 @@ const nav: Record<DashboardKind, { label: string; href: string; icon: LucideIcon
     { label: "Overview", href: "/admin", icon: LayoutDashboard },
     { label: "Assessment roles", href: "/admin/roles", icon: BookOpenCheck },
     { label: "Assessment operations", href: "/admin/assessments", icon: FileCheck2 },
-    { label: "Users", href: "/admin#users", icon: Users },
+    { label: "Users", href: "/admin/users", icon: Users },
+    { label: "Audit log", href: "/admin/audit", icon: Activity },
+    { label: "Platform settings", href: "/admin/settings", icon: CircleHelp },
     { label: "Platform health", href: "/admin#health", icon: Activity },
   ],
 };
@@ -87,7 +89,7 @@ const details: Record<DashboardKind, {
   },
 };
 
-export function DashboardShell({ kind }: { kind: DashboardKind }) {
+export function DashboardShell({ kind, metricsOverride }: { kind: DashboardKind; metricsOverride?: DashboardItem[] }) {
   const data = details[kind];
   const ctaHref = kind === "learner" ? "/#how-it-works" : kind === "assessor" ? "/assessor#guidelines" : "/admin/roles";
   const listId = kind === "learner" ? "projects" : kind === "assessor" ? "queue" : "users";
@@ -140,7 +142,7 @@ export function DashboardShell({ kind }: { kind: DashboardKind }) {
             </div>
 
             <div className="mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {data.metrics.map(({ label, value, note, icon: Icon }) => (
+              {(metricsOverride ?? data.metrics).map(({ label, value, note, icon: Icon }) => (
                 <article key={label} className="rounded-xl border border-surface-200 bg-white p-5 shadow-subtle">
                   <div className="flex items-start justify-between"><span className="text-sm font-medium text-surface-600">{label}</span><span className="grid size-9 place-items-center rounded-lg bg-surface-50 text-navy-700"><Icon size={17} /></span></div>
                   <div className="mt-5 text-3xl font-semibold tracking-tight">{value}</div>
