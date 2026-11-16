@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-05 (Foundation Audit Completed)*
+*Last updated: 2026-11-16 (assessor assignment and calibration workflows implemented)*
 
 ## Legend
 
@@ -52,7 +52,7 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Database schema | ✅ | Auth tables, learner-default role, and foreign keys defined with Drizzle |
-| Database migrations | 🔄 | Initial SQL generated; awaiting configured Neon URL before applying |
+| Database migrations | ✅ | Auth, learner submission, role seed, and assessor calibration migrations applied to Neon |
 | Better Auth integration | ✅ | Neon HTTP adapter, Next route handler, and secure session policy |
 | User registration | ✅ | Email/password registration; role is server-controlled and defaults to learner |
 | Login | ✅ | Email/password sign-in with workspace routing |
@@ -78,10 +78,11 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Role catalog and competency definitions | 🔄 | Data model is in Neon; entry-level frontend developer rubric draft in `docs/product/FRONTEND_DEVELOPER_RUBRIC_DRAFT.md` needs practitioner and employer calibration |
-| Role-specific challenge library | 🔄 | Versioned challenge schema is in Neon; Community Workshop Finder draft in `docs/product/FRONTEND_DEVELOPER_CHALLENGE_DRAFT.md` is not yet published |
-| Versioned rubric management | 🔄 | Rubric versions and criterion-level rating anchors are represented in the schema; management UI is pending |
-| Assessor assignment | ⬜ | |
+| Role catalog and competency definitions | ✅ | Admin-managed role and six entry-level frontend criteria; practitioner calibration remains a content task |
+| Role-specific challenge library | ✅ | Versioned challenge drafts can be edited and published after the rubric |
+| Versioned rubric management | ✅ | Admin UI edits draft criteria and anchors and publishes rubric versions |
+| Assessor assignment | ✅ | Admin assigns only assessors approved for the request's exact rubric version; self-review is blocked |
+| Conflict disclosure and calibration | ✅ | Assessors clear or recuse before reviewing; calibration is version-specific and approved by admin/moderator |
 | Independent evidence-based assessments | ⬜ | Portfolio and role challenge evidence should be evaluated and attributed separately |
 | AI-assisted analysis | ⬜ | |
 | Background processing | ⬜ | |
@@ -99,6 +100,7 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
+| Assessment operations | 🔄 | Admin assessment page handles calibration review and assessor assignment; user management, audit logs, and platform settings remain |
 | User management | ⬜ | |
 | Audit logs | ⬜ | |
 | Platform settings | ⬜ | |

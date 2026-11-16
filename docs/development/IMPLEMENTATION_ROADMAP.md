@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-*Last updated: 2026-11-06 (Phase 2 authentication foundation implemented)*
+*Last updated: 2026-11-16 (assessor assignment and calibration workflows implemented)*
 
 ## Phase 0 — Foundation & Final Foundation Audit ✅
 
@@ -60,14 +60,14 @@
 - [x] Submission status tracking (draft and submitted)
 - [x] Consent and integrity recording at submit time
 
-## Phase 4 — Assessment Engine (data foundation implemented; workflows in progress)
+## Phase 4 — Assessment Engine (in progress)
 
 - [x] Add versioned role, rubric, challenge, verification request, assessor review, and competency rating tables to Neon
-- [ ] Role catalog and competency definitions
-- [ ] Role-specific rubric design with behavioral rating anchors and versioning
-- [ ] Shared role challenge library (ProofWork-authored and reviewed employer briefs)
-- [ ] Assessor assignment system
-- [ ] Assessor conflict-of-interest disclosure and calibration workflow
+- [x] Role catalog and competency definitions (admin-managed role catalog and six entry-level frontend competencies)
+- [x] Role-specific rubric design with behavioral rating anchors and versioning (draft editing and publish controls)
+- [x] Shared role challenge library (ProofWork-authored and reviewed employer briefs; seeded practice challenge)
+- [x] Assessor assignment system (admin assignment requires calibration approval for the request's rubric version)
+- [x] Assessor conflict-of-interest disclosure and calibration workflow (disclose or recuse; human approval of rubric-specific calibration)
 - [ ] Independent assessment interface
 - [ ] Competency-level evaluation tied to portfolio and challenge evidence
 - [ ] AI analysis integration (OpenAI structured outputs)

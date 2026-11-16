@@ -2,6 +2,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -226,6 +227,30 @@ export const assessorReview = pgTable("assessor_review", {
   index("assessor_review_assessor_status_idx").on(table.assessorId, table.status),
 ]);
 
+export type CalibrationAnswer = {
+  criterionId: string;
+  rating: "developing" | "meets_expectations" | "strong";
+  rationale: string;
+};
+
+export const assessorCalibration = pgTable("assessor_calibration", {
+  id: text("id").primaryKey(),
+  assessorId: text("assessor_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  rubricVersionId: text("rubric_version_id").notNull().references(() => rubricVersion.id, { onDelete: "restrict" }),
+  answers: jsonb("answers").$type<CalibrationAnswer[]>().notNull().default([]),
+  status: text("status").$type<"draft" | "submitted" | "approved" | "revision_requested">().notNull().default("draft"),
+  assessorNote: text("assessor_note"),
+  reviewerNote: text("reviewer_note"),
+  reviewedBy: text("reviewed_by").references(() => user.id, { onDelete: "set null" }),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("assessor_calibration_assessor_rubric_unique").on(table.assessorId, table.rubricVersionId),
+  index("assessor_calibration_rubric_status_idx").on(table.rubricVersionId, table.status),
+]);
+
 export const competencyRating = pgTable("competency_rating", {
   id: text("id").primaryKey(),
   reviewId: text("review_id").notNull().references(() => assessorReview.id, { onDelete: "cascade" }),
@@ -254,5 +279,6 @@ export const databaseSchema = {
   challengeEvidence,
   verificationRequest,
   assessorReview,
+  assessorCalibration,
   competencyRating,
 };
