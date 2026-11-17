@@ -86,7 +86,7 @@
 | Learner challenge and verification request | ✅ | Learners submit a versioned role challenge and pair it with a portfolio version; employer discovery and AI analysis are explicit opt-ins |
 | Independent evidence-based assessments | ✅ | Assessor rating per competency cites portfolio or challenge evidence; drafts can be saved and submitted |
 | AI-assisted analysis | 🔄 | Structured Responses API worker is implemented and gated by learner consent and an admin setting; OpenAI credentials remain missing |
-| Background processing | ✅ | Authenticated worker route, five-minute Vercel Cron schedule, and bounded retry handling |
+| Background processing | ✅ | Authenticated worker route, Hobby-compatible daily Vercel Cron schedule, and bounded retry handling |
 | Disagreement moderation | ✅ | Two-level disagreement threshold flags requests; moderator/admin makes the final decision |
 
 ## Phase 5 — Moderation & Reports

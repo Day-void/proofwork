@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const allowedTypes = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp", "text/plain"]);
 
-export function EvidenceFileUploader({ submissionId }: { submissionId: string }) {
+export function EvidenceFileUploader({ submissionId, enabled = true }: { submissionId: string; enabled?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -51,5 +51,6 @@ export function EvidenceFileUploader({ submissionId }: { submissionId: string })
     await attachEvidenceFile(actionData);
   }
 
+  if (!enabled) return <p className="mt-4 rounded-lg border border-dashed border-surface-300 bg-surface-50 p-4 text-xs leading-5 text-surface-600">File uploads are unavailable in this environment. Add a project, repository, or demo link above; private file storage can be enabled later.</p>;
   return <form onSubmit={upload} className="mt-4 grid gap-3 rounded-lg border border-dashed border-surface-300 p-4 sm:grid-cols-[1fr_1.4fr_auto] sm:items-end"><div><label htmlFor={`file-title-${submissionId}`} className="text-xs font-medium">File title</label><input id={`file-title-${submissionId}`} name="title" maxLength={100} placeholder="Screenshot or project brief" className="mt-1.5 min-h-10 w-full rounded-md border border-surface-200 px-3 text-sm" /></div><div><label htmlFor={`file-${submissionId}`} className="text-xs font-medium">File (10 MB max)</label><input id={`file-${submissionId}`} name="file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp,text/plain" required className="mt-1.5 block w-full text-xs file:mr-3 file:rounded-md file:border-0 file:bg-surface-100 file:px-3 file:py-2" /></div><Button type="submit" disabled={busy} variant="outline">{busy ? "Uploading…" : "Upload file"}</Button>{error && <p role="alert" className="text-xs text-red-700 sm:col-span-3">{error}</p>}</form>;
 }

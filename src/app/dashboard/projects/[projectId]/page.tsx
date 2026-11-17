@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EvidenceFileUploader } from "@/components/submissions/evidence-file-uploader";
+import { env } from "@/config/env";
 import { addEvidenceLink, saveSubmissionDraft, startSubmission, submitSubmission } from "@/features/submissions/actions";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
@@ -68,7 +69,7 @@ export default async function LearnerProjectPage({ params, searchParams }: {
             <h4 className="font-semibold">Evidence links</h4><p className="mt-1 text-sm text-surface-500">Add a live project, repository, demo, or other work sample.</p>
             {versions.length > 0 && evidence.length > 0 && <ul className="mt-4 space-y-2">{evidence.map((item) => <li key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-surface-50 px-3 py-2.5"><span className="min-w-0"><span className="block truncate text-sm font-medium">{item.title}</span><a href={item.kind === "file" ? `/api/uploads/download?evidenceId=${encodeURIComponent(item.id)}` : item.url ?? "#"} target="_blank" rel="noreferrer" className="inline-flex max-w-full items-center gap-1 truncate text-xs text-accent-700 hover:text-accent-800">{item.kind === "file" ? `${item.contentType ?? "File"} · ${Math.round((item.byteSize ?? 0) / 1024)} KB` : item.url}<ArrowUpRight size={12} /></a></span><Badge variant="outline">{item.kind === "file" ? "File" : "Link"}</Badge></li>)}</ul>}
             <form action={addEvidenceLink} className="mt-4 grid gap-3 sm:grid-cols-[1fr_1.5fr_auto] sm:items-end"><input type="hidden" name="submissionId" value={draft.id} /><div className="space-y-2"><Label htmlFor="evidenceTitle">Evidence title</Label><Input id="evidenceTitle" name="title" minLength={2} maxLength={100} required placeholder="Source code repository" /></div><div className="space-y-2"><Label htmlFor="evidenceUrl">URL</Label><Input id="evidenceUrl" name="url" type="url" required placeholder="https://github.com/you/project" /></div><Button type="submit" variant="outline">Add link</Button></form>
-            <EvidenceFileUploader submissionId={draft.id} />
+            <EvidenceFileUploader submissionId={draft.id} enabled={Boolean(env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME)} />
           </div>
         </article>}
 

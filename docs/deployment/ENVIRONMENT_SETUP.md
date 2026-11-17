@@ -29,7 +29,7 @@ Set these values in the hosting provider's encrypted environment settings. Do no
 - `OPENAI_API_KEY`: optional. `OPENAI_MODEL` defaults to `gpt-4.1-mini` and can be set to an enabled Responses API model that supports Structured Outputs.
 - `CRON_SECRET`: unique random value of at least 32 characters. Configure the same value in the Vercel environment so the scheduled assessment-analysis route can authenticate.
 - The database setting `ai_analysis_enabled` is off until an admin enables it. Learners separately opt in per verification request. The worker sends project narratives and human ratings, omits names and URLs, and stores advisory structured output. It never decides an outcome.
-- `vercel.json` schedules the worker every five minutes. Confirm the deployment plan supports Vercel Cron before relying on automated processing; the route can also be invoked by a trusted scheduler using `Authorization: Bearer <CRON_SECRET>`.
+- `vercel.json` schedules the worker once daily at 03:00 UTC, which is compatible with Vercel Hobby. Pro can use a more frequent schedule if needed; the route can also be invoked by a trusted scheduler using `Authorization: Bearer <CRON_SECRET>`.
 
 ## Feature switches
 
