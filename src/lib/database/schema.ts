@@ -230,6 +230,7 @@ export const verificationRequest = pgTable("verification_request", {
   index("verification_request_learner_idx").on(table.learnerId),
   index("verification_request_status_idx").on(table.status),
   uniqueIndex("verification_request_token_hash_unique").on(table.verificationTokenHash),
+  uniqueIndex("verification_request_submission_pair_unique").on(table.learnerId, table.portfolioSubmissionId, table.challengeSubmissionId),
 ]);
 
 export const assessorReview = pgTable("assessor_review", {

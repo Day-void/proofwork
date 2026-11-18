@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "verification_request_submission_pair_unique" ON "verification_request" USING btree ("learner_id","portfolio_submission_id","challenge_submission_id");
