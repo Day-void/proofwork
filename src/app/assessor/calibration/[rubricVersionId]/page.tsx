@@ -4,6 +4,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WorkspaceHeader } from "@/components/dashboard/workspace-header";
 import { submitCalibration } from "@/features/assessment/workflow-actions";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
@@ -33,9 +34,9 @@ export default async function RubricCalibrationPage({ params }: { params: Promis
   const [existing] = await db.select().from(assessorCalibration).where(and(
     eq(assessorCalibration.assessorId, session.user.id), eq(assessorCalibration.rubricVersionId, rubricVersionId),
   )).limit(1);
-  if (existing?.status === "approved") return <main className="mx-auto max-w-3xl p-8"><h1 className="text-2xl font-semibold">Calibration approved</h1><p className="mt-2 text-sm text-surface-600">You are calibrated for this rubric version.</p><Link href="/assessor" className="mt-4 inline-flex text-sm underline">Return to assessor workspace</Link></main>;
+  if (existing?.status === "approved") return <main className="min-h-screen bg-surface-50 text-navy-950"><WorkspaceHeader kind="assessor" label="Assessor workspace" /><div className="mx-auto max-w-3xl p-8"><h1 className="text-2xl font-semibold">Calibration approved</h1><p className="mt-2 text-sm text-surface-600">You are calibrated for this rubric version.</p><Link href="/assessor" className="mt-4 inline-flex text-sm underline">Return to assessor workspace</Link></div></main>;
   const answerByCriterion = new Map((existing?.answers ?? []).map((answer) => [answer.criterionId, answer]));
-  return <main className="min-h-screen bg-surface-50 text-navy-950"><div className="mx-auto max-w-4xl px-5 py-10 sm:px-8"><Link href="/assessor" className="inline-flex items-center gap-2 text-sm font-medium text-surface-600"><ArrowLeft size={16} /> Assessor workspace</Link>
+  return <main className="min-h-screen bg-surface-50 text-navy-950"><WorkspaceHeader kind="assessor" label="Assessor workspace" /><div className="mx-auto max-w-4xl px-5 py-10 sm:px-8"><Link href="/assessor" className="inline-flex items-center gap-2 text-sm font-medium text-surface-600"><ArrowLeft size={16} /> Assessor workspace</Link>
     <div className="mt-6"><Badge variant="secondary" className="bg-accent-50 text-accent-800">Calibration exercise</Badge><h1 className="mt-3 text-3xl font-semibold tracking-[-.045em]">{data.roleTitle}: {data.rubric.title}</h1><p className="mt-2 text-sm leading-6 text-surface-600">For each competency, choose the anchor that best represents the example level and explain your reasoning. A moderator or administrator will review your calibration before you receive assignments.</p></div>
     {existing?.reviewerNote && <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm"><strong>Reviewer feedback:</strong> {existing.reviewerNote}</p>}
     <form action={submitCalibration} className="mt-6 space-y-5"><input type="hidden" name="rubricVersionId" value={rubricVersionId} />

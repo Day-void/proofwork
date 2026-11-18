@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { WorkspaceHeader } from "@/components/dashboard/workspace-header";
 import { Button } from "@/components/ui/button";
 import { saveAssessmentDraft, submitAssessmentReview } from "@/features/assessment/workflow-actions";
 import { requireRole } from "@/lib/auth/guards";
@@ -49,7 +50,7 @@ export default async function EvidenceReviewPage({ params, searchParams }: {
     ...challengeMaterials.map((item) => ({ value: `challenge:${item.id}`, label: `Challenge: ${item.title} — ${item.url ?? "file"}` })),
   ];
   const evidenceOptions = [...portfolioOptions, ...challengeOptions];
-  return <main className="min-h-screen bg-surface-50 text-navy-950"><div className="mx-auto max-w-6xl px-5 py-9 sm:px-8">
+  return <main className="min-h-screen bg-surface-50 text-navy-950"><WorkspaceHeader kind="assessor" label="Assessor workspace" /><div className="mx-auto max-w-6xl px-5 py-9 sm:px-8">
     <Link href="/assessor" className="inline-flex items-center gap-2 text-sm text-surface-600"><ArrowLeft size={16} /> Assessor workspace</Link>
     <header className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><div className="flex flex-wrap items-start justify-between gap-3"><div><Badge variant="secondary" className="bg-accent-50 text-accent-800">{data.role.title} · {data.role.targetLevel}</Badge><h1 className="mt-3 text-2xl font-semibold tracking-tight">Independent evidence review</h1><p className="mt-1 text-sm text-surface-500">Rubric: {data.rubric.title}. Evaluate the portfolio and challenge separately, and link each rating to specific evidence.</p></div><StatusBadge status={data.review.status} /></div></header>
     {query.saved === "1" && <p role="status" className="mt-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">Review draft saved.</p>}

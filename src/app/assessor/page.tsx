@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileCheck2 } from "lucide-react";
+import { WorkspaceHeader } from "@/components/dashboard/workspace-header";
 import { and, asc, eq } from "drizzle-orm";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +28,7 @@ export default async function AssessorDashboardPage() {
     .where(and(eq(rubricVersion.status, "published"), eq(assessmentRole.active, true)));
   const calibrations = await db.select().from(assessorCalibration).where(eq(assessorCalibration.assessorId, session.user.id));
   const calibrationByRubric = new Map(calibrations.map((item) => [item.rubricVersionId, item]));
-  return <main className="min-h-screen bg-surface-50 text-navy-950"><div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
+  return <main className="min-h-screen bg-surface-50 text-navy-950"><WorkspaceHeader kind="assessor" label="Assessor workspace" /><div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
     <Badge variant="secondary" className="bg-accent-50 text-accent-800">Assessor workspace</Badge><h1 className="mt-3 text-3xl font-semibold tracking-[-.045em]">Reviews and calibration</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-surface-600">Disclose conflicts before reviewing a submission. Complete rubric calibration so administrators can assign you work for that rubric version.</p>
     <section className="mt-8 rounded-xl border border-surface-200 bg-white"><header className="border-b border-surface-200 px-5 py-4"><h2 className="font-semibold">Assigned reviews</h2><p className="mt-1 text-xs text-surface-500">The learner&apos;s identity and submission evidence will be shown in the review workspace.</p></header>
       {reviews.length === 0 ? <p className="p-6 text-sm text-surface-500">No reviews are assigned to you yet. Approved calibration makes you eligible for new work.</p> : <div className="divide-y divide-surface-200">{reviews.map(({ review, request, roleTitle, rubricTitle, learnerName }) => <article key={review.id} className="p-5 sm:p-6"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-semibold">{roleTitle}</h3><p className="mt-1 text-xs text-surface-500">{rubricTitle} · Learner: {learnerName} · Request {request.id}</p></div><div className="flex flex-wrap gap-2"><StatusBadge status={review.status} /><StatusBadge status={review.conflictStatus} /></div></div>
