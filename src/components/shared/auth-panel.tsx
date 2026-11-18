@@ -12,10 +12,10 @@ import { authClient } from "@/lib/auth/client";
 type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 
 const copy: Record<AuthMode, { eyebrow: string; title: string; description: string; submit: string }> = {
-  login: { eyebrow: "Welcome back", title: "Sign in to ProofWork", description: "Pick up where you left off and keep building your proof of work.", submit: "Continue" },
-  register: { eyebrow: "Start with your work", title: "Create your account", description: "Build a portfolio that makes your practical skills easier to see.", submit: "Create account" },
-  "forgot-password": { eyebrow: "Account recovery", title: "Reset your password", description: "Enter the email address linked to your account and we’ll send recovery instructions if an account matches.", submit: "Send reset link" },
-  "reset-password": { eyebrow: "Choose a new password", title: "Set a new password", description: "Choose a strong password you don’t use on another site.", submit: "Update password" },
+  login: { eyebrow: "Welcome back", title: "Your work is waiting", description: "Sign in to pick up where you left off and keep building proof of what you can do.", submit: "Continue to my workspace" },
+  register: { eyebrow: "Start with your work", title: "Give your work a place to grow", description: "Start with one real project. You do not need a perfect portfolio to begin.", submit: "Create my account" },
+  "forgot-password": { eyebrow: "Account recovery", title: "Let’s get you back in", description: "Enter your account email and we’ll send recovery instructions if it matches a ProofWork account.", submit: "Send recovery link" },
+  "reset-password": { eyebrow: "Choose a new password", title: "Set a new password", description: "Choose a strong password you do not use on another site, then return to your work.", submit: "Save new password" },
 };
 
 function getWorkspacePath(role?: string) {
