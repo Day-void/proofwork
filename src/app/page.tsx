@@ -34,24 +34,24 @@ export default function HomePage() {
 
       <section className="relative overflow-hidden bg-[#f1f7ff]">
         <div aria-hidden="true" className="absolute inset-0 opacity-60" style={{ backgroundImage: "radial-gradient(ellipse at 12% 5%, rgba(47,202,183,.18), transparent 34%), radial-gradient(ellipse at 86% 90%, rgba(85,145,215,.16), transparent 36%)" }} />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[.95fr_1.05fr] lg:gap-14 lg:py-20">
-          <div className="max-w-2xl">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-5 pb-12 pt-12 text-center sm:px-8 sm:pb-16 sm:pt-16 lg:pb-20 lg:pt-20">
+          <div className="max-w-4xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-accent-700/10 bg-white/75 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-800"><span className="size-1.5 rounded-full bg-accent-500" /> Evidence for practical skills</div>
-            <h1 className="mt-6 text-balance text-4xl font-normal leading-[1.08] tracking-[-.05em] sm:text-[2.75rem] lg:text-[3.5rem]">Make your skills visible.<br /><span className="text-accent-700">Back them with proof.</span></h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-surface-600 sm:text-lg sm:leading-8">Build a portfolio around real projects, document how you work, and prepare for role-based skills verification.</p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <h1 className="mt-6 text-balance text-4xl font-normal leading-[1.08] tracking-[-.05em] sm:text-[3.25rem] lg:text-[3.75rem]">Make your skills visible.<br /><span className="text-accent-700">Back them with proof.</span></h1>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-surface-600 sm:text-lg sm:leading-8">Build a portfolio around real projects, document how you work, and prepare for role-based skills verification.</p>
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-12 bg-accent-400 px-6 font-semibold text-navy-950 hover:bg-accent-300"><Link href="/register">Create your portfolio <ArrowRight className="ml-2 size-4" /></Link></Button>
               <Button asChild size="lg" variant="outline" className="h-12 border-navy-200 bg-white/70 px-6 text-navy-900 hover:bg-white"><a href="#how-it-works">See how it works <ArrowDown className="ml-2 size-4" /></a></Button>
             </div>
-            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-surface-600"><span className="inline-flex items-center gap-2"><ShieldCheck size={16} className="text-accent-700" /> Private by default</span><span className="inline-flex items-center gap-2"><FileCheck2 size={16} className="text-accent-700" /> Evidence-led</span></div>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-surface-600"><span className="inline-flex items-center gap-2"><ShieldCheck size={16} className="text-accent-700" /> Private by default</span><span className="inline-flex items-center gap-2"><FileCheck2 size={16} className="text-accent-700" /> Evidence-led</span></div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-2xl">
-            <div className="relative min-h-[340px] overflow-hidden rounded-[1.75rem] bg-navy-900 shadow-elevated sm:min-h-[430px]">
+          <div className="relative mx-auto mt-10 w-full max-w-5xl sm:mt-12">
+            <div className="relative min-h-[330px] overflow-hidden rounded-[1.5rem] bg-navy-900 shadow-elevated sm:min-h-[410px] sm:rounded-[1.75rem]">
               <Image src="/images/hero2.jpeg" alt="A developer working through a project on a laptop" fill sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover object-[64%_38%]" priority />
               <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-navy-950/75 via-navy-950/5 to-transparent" />
-              <div className="absolute left-4 top-4 rounded-full border border-white/30 bg-navy-950/40 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.14em] text-white backdrop-blur sm:left-6 sm:top-6">Your work is the starting point</div>
-              <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/70 bg-white/95 p-4 shadow-2xl backdrop-blur sm:bottom-6 sm:left-6 sm:right-6 sm:p-5">
+              <div className="absolute left-4 top-4 rounded-full border border-white/30 bg-navy-950/40 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.14em] text-white backdrop-blur sm:left-7 sm:top-7">Your work is the starting point</div>
+              <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/70 bg-white/95 p-4 text-left shadow-2xl backdrop-blur sm:bottom-7 sm:left-7 sm:right-7 sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div><div className="text-[10px] font-semibold uppercase tracking-[.16em] text-accent-800">Illustrative assessment path</div><h2 className="mt-1 text-lg font-semibold tracking-tight">Frontend developer</h2></div>
                   <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-800">Product preview</span>
@@ -65,13 +65,13 @@ export default function HomePage() {
           </div>
         </div>
         <div className="relative border-t border-navy-900/10 bg-white/65">
-          <div className="mx-auto grid max-w-7xl gap-3 px-5 py-4 text-sm font-medium text-navy-800 sm:grid-cols-3 sm:px-8 sm:gap-6"><div className="flex items-center gap-2"><ShieldCheck size={17} className="text-accent-700" /> Private project workspace</div><div className="flex items-center gap-2"><CircleDot size={17} className="text-accent-700" /> Versioned submissions</div><div className="flex items-center gap-2"><FileCheck2 size={17} className="text-accent-700" /> Project evidence links</div></div>
+          <div className="mx-auto grid max-w-7xl gap-3 px-5 py-5 text-sm font-medium text-navy-800 sm:grid-cols-3 sm:px-8 sm:py-6 sm:gap-6"><div className="flex items-center gap-2"><ShieldCheck size={17} className="text-accent-700" /> Private project workspace</div><div className="flex items-center gap-2"><CircleDot size={17} className="text-accent-700" /> Versioned submissions</div><div className="flex items-center gap-2"><FileCheck2 size={17} className="text-accent-700" /> Project evidence links</div></div>
         </div>
       </section>
 
       <section id="how-it-works" className="scroll-mt-20 px-5 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-7xl">
-          <div className="max-w-2xl"><div className="text-xs font-semibold uppercase tracking-[.18em] text-accent-800">A clearer path to proof</div><h2 className="mt-3 text-balance text-[2rem] font-medium leading-tight tracking-[-.04em] sm:text-[2.25rem]">Build from real work. Add a consistent test.</h2><p className="mt-4 text-base leading-7 text-surface-600">A portfolio shows how you work in context. A role-based task can make the skills easier to compare. A human review should explain what the evidence supports.</p></div>
+          <div className="mx-auto max-w-3xl text-center"><div className="text-xs font-semibold uppercase tracking-[.18em] text-accent-800">A clearer path to proof</div><h2 className="mt-3 text-balance text-[2rem] font-medium leading-tight tracking-[-.04em] sm:text-[2.25rem]">Build from real work. Add a consistent test.</h2><p className="mt-4 text-base leading-7 text-surface-600">A portfolio shows how you work in context. A role-based task can make the skills easier to compare. A human review should explain what the evidence supports.</p></div>
           <div className="mt-8 grid gap-4 md:grid-cols-3">{steps.map(({ icon: Icon, title, text, status }, index) => <article key={title} className="rounded-2xl border border-surface-200 bg-white p-5 shadow-subtle transition duration-200 hover:-translate-y-0.5 hover:border-accent-200 hover:shadow-elevated sm:p-6"><div className="flex items-center justify-between"><span className="grid size-11 place-items-center rounded-xl bg-accent-50 text-accent-800"><Icon size={21} /></span><span className="font-mono text-xs text-surface-400">0{index + 1}</span></div><div className={`mt-5 inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${status === "Available now" ? "bg-accent-50 text-accent-800" : "bg-surface-100 text-surface-600"}`}>{status}</div><h3 className="mt-3 text-lg font-semibold tracking-tight">{title}</h3><p className="mt-2 text-sm leading-6 text-surface-600">{text}</p></article>)}</div>
         </div>
       </section>
