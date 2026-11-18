@@ -37,7 +37,7 @@ export default function HomePage() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[.95fr_1.05fr] lg:gap-14 lg:py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-accent-700/10 bg-white/75 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-accent-800"><span className="size-1.5 rounded-full bg-accent-500" /> Evidence for practical skills</div>
-            <h1 className="mt-6 text-balance text-4xl font-medium leading-[1.08] tracking-[-.05em] sm:text-[2.75rem] lg:text-[3.5rem]">Make your skills visible.<br /><span className="text-accent-700">Back them with proof.</span></h1>
+            <h1 className="mt-6 text-balance text-4xl font-normal leading-[1.08] tracking-[-.05em] sm:text-[2.75rem] lg:text-[3.5rem]">Make your skills visible.<br /><span className="text-accent-700">Back them with proof.</span></h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-surface-600 sm:text-lg sm:leading-8">Build a portfolio around real projects, document how you work, and prepare for role-based skills verification.</p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-12 bg-accent-400 px-6 font-semibold text-navy-950 hover:bg-accent-300"><Link href="/register">Create your portfolio <ArrowRight className="ml-2 size-4" /></Link></Button>
