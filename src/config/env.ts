@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 const envSchema = z.object({
   // Database
   DATABASE_URL: z.url().optional(),
+  DATABASE_URL_UNPOOLED: z.url().optional(),
 
   // Authentication
   BETTER_AUTH_SECRET: z.string().min(32).optional(),

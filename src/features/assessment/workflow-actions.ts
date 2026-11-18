@@ -8,6 +8,7 @@ import { requiresModeration } from "@/features/assessment/scoring";
 import { assertTransition } from "@/features/assessment/state";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
+import { transactionalDb } from "@/lib/database/transaction";
 import {
   assessorCalibration,
   assessorReview,
@@ -74,16 +75,19 @@ export async function recordConflictDisclosure(formData: FormData) {
     eq(assessorReview.conflictStatus, "pending"), eq(assessorReview.status, "assigned"),
   )).limit(1);
   if (!review) throw new Error("This review is not awaiting your disclosure.");
-  await store.update(assessorReview).set({
-    conflictStatus: values.decision,
-    conflictReason: values.reason || null,
-    status: values.decision === "recused" ? "recused" : "in_progress",
-  }).where(eq(assessorReview.id, review.id));
-  if (values.decision === "cleared") {
-    const [request] = await store.select({ status: verificationRequest.status }).from(verificationRequest).where(eq(verificationRequest.id, review.requestId)).limit(1);
-    if (request) assertTransition(request.status, "in_review");
-    await store.update(verificationRequest).set({ status: "in_review" }).where(eq(verificationRequest.id, review.requestId));
-  }
+  const writeStore = transactionalDb ?? store;
+  await writeStore.transaction(async (tx) => {
+    await tx.update(assessorReview).set({
+      conflictStatus: values.decision,
+      conflictReason: values.reason || null,
+      status: values.decision === "recused" ? "recused" : "in_progress",
+    }).where(eq(assessorReview.id, review.id));
+    if (values.decision === "cleared") {
+      const [request] = await tx.select({ status: verificationRequest.status }).from(verificationRequest).where(eq(verificationRequest.id, review.requestId)).limit(1);
+      if (request) assertTransition(request.status, "in_review");
+      await tx.update(verificationRequest).set({ status: "in_review" }).where(eq(verificationRequest.id, review.requestId));
+    }
+  });
   revalidatePath("/assessor");
   revalidatePath("/admin/assessments");
   redirect("/assessor?disclosureRecorded=1");
