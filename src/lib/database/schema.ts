@@ -124,6 +124,21 @@ export const submissionEvidence = pgTable("submission_evidence", {
   )`),
 ]);
 
+export const uploadSession = pgTable("upload_session", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  submissionId: text("submission_id").notNull().references(() => projectSubmission.id, { onDelete: "cascade" }),
+  objectKey: text("object_key").notNull().unique(),
+  contentType: text("content_type").notNull(),
+  byteSize: integer("byte_size").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("upload_session_user_idx").on(table.userId),
+  index("upload_session_expiry_idx").on(table.expiresAt),
+]);
+
 export const assessmentRole = pgTable("assessment_role", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull(),
@@ -332,6 +347,7 @@ export const databaseSchema = {
   learnerProject,
   projectSubmission,
   submissionEvidence,
+  uploadSession,
   assessmentRole,
   rubricVersion,
   rubricCriterion,

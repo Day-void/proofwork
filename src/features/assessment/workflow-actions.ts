@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod/v4";
 import { requiresModeration } from "@/features/assessment/scoring";
+import { assertTransition } from "@/features/assessment/state";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
 import {
@@ -79,6 +80,8 @@ export async function recordConflictDisclosure(formData: FormData) {
     status: values.decision === "recused" ? "recused" : "in_progress",
   }).where(eq(assessorReview.id, review.id));
   if (values.decision === "cleared") {
+    const [request] = await store.select({ status: verificationRequest.status }).from(verificationRequest).where(eq(verificationRequest.id, review.requestId)).limit(1);
+    if (request) assertTransition(request.status, "in_review");
     await store.update(verificationRequest).set({ status: "in_review" }).where(eq(verificationRequest.id, review.requestId));
   }
   revalidatePath("/assessor");

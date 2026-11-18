@@ -8,6 +8,7 @@ import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
 import { auditLog, assessorReview, platformSetting, verificationRequest, verificationShare } from "@/lib/database/schema";
 import { env } from "@/config/env";
+import { assertTransition } from "@/features/assessment/state";
 
 function database() {
   if (!db) throw new Error("The database is not configured.");
@@ -32,6 +33,7 @@ export async function finalizeVerification(formData: FormData) {
   ));
   if (!reviews.length) throw new Error("At least one submitted assessor review is required before a decision.");
   const status = values.decision === "reopened" ? "submitted" : values.decision;
+  assertTransition(request.status, status);
   const terminal = status === "approved" || status === "rejected";
   await store.update(verificationRequest).set({
     status,
@@ -58,6 +60,7 @@ export async function appealVerification(formData: FormData) {
     eq(verificationRequest.id, values.requestId), eq(verificationRequest.learnerId, session.user.id),
   )).limit(1);
   if (!request || !["approved", "rejected", "needs_more_evidence"].includes(request.status)) throw new Error("This verification cannot be appealed in its current state.");
+  assertTransition(request.status, "appealed");
   const priorNote = request.decisionNote ? `${request.decisionNote}\n\nAppeal: ${values.reason}` : `Appeal: ${values.reason}`;
   await store.update(verificationRequest).set({ status: "appealed", decisionNote: priorNote }).where(eq(verificationRequest.id, request.id));
   await store.insert(auditLog).values({ id: crypto.randomUUID(), actorId: session.user.id, action: "verification_appealed", targetType: "verification_request", targetId: request.id, details: { priorStatus: request.status } });

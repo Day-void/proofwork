@@ -5,6 +5,7 @@ import { env } from "@/config/env";
 import { db } from "@/lib/database";
 import { authSchema } from "@/lib/database/schema";
 import { sendPasswordResetEmail } from "@/lib/auth/email";
+import { logger } from "@/lib/observability/logger";
 
 export const auth = betterAuth({
   appName: "ProofWork",
@@ -49,7 +50,7 @@ export const auth = betterAuth({
           await sendPasswordResetEmail(user.email, url);
         } catch (error) {
           const message = error instanceof Error ? error.message : "Unknown mail provider error.";
-          console.error("Could not send ProofWork password reset email:", message);
+          logger.error("Password reset email delivery failed", { provider: "resend", error: message });
         }
       });
     },

@@ -25,29 +25,26 @@ export function EvidenceFileUploader({ submissionId, enabled = true }: { submiss
       return;
     }
     setBusy(true);
-    let uploaded: { objectKey: string };
+    let uploaded: { uploadSessionId: string };
     try {
       const response = await fetch("/api/uploads/presign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: file.name, contentType: file.type, byteSize: file.size }),
+        body: JSON.stringify({ submissionId, fileName: file.name, contentType: file.type, byteSize: file.size }),
       });
-      const payload = await response.json() as { uploadUrl?: string; objectKey?: string; error?: string };
-      if (!response.ok || !payload.uploadUrl || !payload.objectKey) throw new Error(payload.error ?? "Could not prepare file upload.");
+      const payload = await response.json() as { uploadUrl?: string; uploadSessionId?: string; error?: string };
+      if (!response.ok || !payload.uploadUrl || !payload.uploadSessionId) throw new Error(payload.error ?? "Could not prepare file upload.");
       const put = await fetch(payload.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
       if (!put.ok) throw new Error("The storage service rejected the upload. Check the bucket CORS settings and try again.");
-      uploaded = { objectKey: payload.objectKey };
+      uploaded = { uploadSessionId: payload.uploadSessionId };
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Upload failed.");
       setBusy(false);
       return;
     }
     const actionData = new FormData();
-    actionData.set("submissionId", submissionId);
     actionData.set("title", String(data.get("title") ?? file.name));
-    actionData.set("objectKey", uploaded.objectKey);
-    actionData.set("contentType", file.type);
-    actionData.set("byteSize", String(file.size));
+    actionData.set("uploadSessionId", uploaded.uploadSessionId);
     await attachEvidenceFile(actionData);
   }
 

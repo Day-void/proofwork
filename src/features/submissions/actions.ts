@@ -1,11 +1,11 @@
 "use server";
 
-import { and, eq, max } from "drizzle-orm";
+import { and, eq, isNull, max } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod/v4";
 import { db } from "@/lib/database";
-import { learnerProfile, learnerProject, projectSubmission, submissionEvidence } from "@/lib/database/schema";
+import { learnerProfile, learnerProject, projectSubmission, submissionEvidence, uploadSession } from "@/lib/database/schema";
 import { requireRole } from "@/lib/auth/guards";
 
 function requireDatabase() {
@@ -135,17 +135,18 @@ export async function addEvidenceLink(formData: FormData) {
 
 export async function attachEvidenceFile(formData: FormData) {
   const session = await requireRole(["learner"]);
-  const submissionId = z.string().uuid().parse(formData.get("submissionId"));
-  const { submission } = await ownedDraft(submissionId, session.user.id);
-  const values = z.object({
-    title: z.string().trim().min(2).max(100),
-    objectKey: z.string().min(1).max(500),
-    contentType: z.enum(["application/pdf", "image/jpeg", "image/png", "image/webp", "text/plain"]),
-    byteSize: z.coerce.number().int().positive().max(10 * 1024 * 1024),
-  }).parse({ title: formData.get("title"), objectKey: formData.get("objectKey"), contentType: formData.get("contentType"), byteSize: formData.get("byteSize") });
-  if (!values.objectKey.startsWith(`proofwork/${session.user.id}/`) || values.objectKey.includes("..")) throw new Error("The uploaded file key is not valid for this account.");
-  await requireDatabase().insert(submissionEvidence).values({
-    id: crypto.randomUUID(), submissionId, kind: "file", ...values,
+  const uploadSessionId = z.string().uuid().parse(formData.get("uploadSessionId"));
+  const title = z.string().trim().min(2).max(100).parse(formData.get("title"));
+  const database = requireDatabase();
+  const [pending] = await database.select().from(uploadSession)
+    .where(and(eq(uploadSession.id, uploadSessionId), eq(uploadSession.userId, session.user.id))).limit(1);
+  if (!pending || pending.usedAt || pending.expiresAt <= new Date()) throw new Error("This upload has expired. Please upload the file again.");
+  const { submission } = await ownedDraft(pending.submissionId, session.user.id);
+  const [claimed] = await database.update(uploadSession).set({ usedAt: new Date() })
+    .where(and(eq(uploadSession.id, pending.id), isNull(uploadSession.usedAt))).returning({ id: uploadSession.id });
+  if (!claimed) throw new Error("This upload has already been attached.");
+  await database.insert(submissionEvidence).values({
+    id: crypto.randomUUID(), submissionId: submission.id, kind: "file", title, objectKey: pending.objectKey, contentType: pending.contentType, byteSize: pending.byteSize,
   });
   revalidatePath(`/dashboard/projects/${submission.projectId}`);
   redirect(`/dashboard/projects/${submission.projectId}`);

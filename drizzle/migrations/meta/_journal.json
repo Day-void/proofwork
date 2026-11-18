@@ -64,6 +64,13 @@
       "when": 1794988564491,
       "tag": "0008_ancient_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794988879623,
+      "tag": "0009_keen_clea",
+      "breakpoints": true
     }
   ]
 }
