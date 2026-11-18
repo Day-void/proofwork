@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { desc, eq, inArray } from "drizzle-orm";
-import { ArrowRight, BriefcaseBusiness, CircleUserRound, ClipboardCheck, FileCheck2, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, CircleUserRound, ClipboardCheck, FileCheck2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { WorkspaceHeader } from "@/components/dashboard/workspace-header";
+import { WorkspaceMenu } from "@/components/dashboard/workspace-menu";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
 import { learnerProject, projectSubmission } from "@/lib/database/schema";
@@ -30,26 +30,22 @@ export default async function LearnerDashboardPage() {
 
   return (
     <main className="min-h-screen bg-surface-50 text-navy-950">
-      <WorkspaceHeader kind="learner" label="Learner workspace">
-          <nav aria-label="Learner account" className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
+      <header className="border-b border-surface-200 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+          <Link href="/" className="font-semibold tracking-tight">proofwork<span className="text-accent-600">.</span></Link>
+          <nav aria-label="Learner account" className="flex flex-wrap items-center justify-end gap-1 rounded-xl bg-surface-50 p-1 sm:gap-2">
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/assessment" aria-label="Assessments"><ClipboardCheck className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Assessments</span></Link></Button>
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/profile" aria-label="Profile"><CircleUserRound className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Profile</span></Link></Button>
             <Button asChild size="sm" className="bg-navy-900 text-white hover:bg-navy-800"><Link href="/dashboard/projects/new" aria-label="New project"><Plus className="size-4 sm:mr-1" /><span className="hidden sm:inline">New project</span></Link></Button>
+            <WorkspaceMenu kind="learner" />
           </nav>
-      </WorkspaceHeader>
-      <section className="mx-auto max-w-7xl px-5 py-7 sm:px-8 sm:py-10">
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px] lg:items-end">
+        </div>
+      </header>
+      <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-11">
         <div className="max-w-2xl">
           <Badge variant="secondary" className="mb-4 bg-accent-50 text-accent-800">Your workspace</Badge>
           <h1 className="text-3xl font-semibold tracking-[-.045em] sm:text-4xl">Your work, in one place.</h1>
           <p className="mt-3 text-sm leading-6 text-surface-600 sm:text-base">Create a project, document how you made it, and submit evidence for a human skills review.</p>
-        </div>
-        <aside className="rounded-2xl border border-accent-100 bg-accent-50/60 p-4 sm:p-5" aria-label="Next step">
-          <div className="flex items-center gap-2 text-accent-800"><span className="grid size-8 place-items-center rounded-lg bg-white"><Sparkles size={16} /></span><span className="text-xs font-semibold uppercase tracking-[.12em]">Your next step</span></div>
-          <p className="mt-3 text-sm font-semibold text-navy-950">{projects.length ? "Keep your project moving" : "Add your first piece of work"}</p>
-          <p className="mt-1 text-xs leading-5 text-surface-600">{projects.length ? "Open a project to update its draft or start a new version." : "Start with something real you have built, designed, researched, or improved."}</p>
-          <Button asChild size="sm" className="mt-4 bg-navy-900 text-white hover:bg-navy-800"><Link href={projects.length ? `/dashboard/projects/${projects[0].id}` : "/dashboard/projects/new"}>{projects.length ? "Open your latest project" : "Create your first project"}<ArrowRight className="ml-1.5 size-4" /></Link></Button>
-        </aside>
         </div>
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           {[{ label: "Projects", value: projects.length, note: "Pieces of work in your workspace", icon: BriefcaseBusiness }, { label: "Submissions", value: submittedCount, note: "Versions sent for human review", icon: FileCheck2 }, { label: "Drafts", value: submissions.length - submittedCount, note: "Work ready for your next step", icon: ClipboardCheck }].map(({ label, value, note, icon: Icon }) => (
