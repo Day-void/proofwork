@@ -33,7 +33,7 @@ export default async function LearnerDashboardPage() {
       <header className="border-b border-surface-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <Link href="/" className="font-semibold tracking-tight">proofwork<span className="text-accent-600">.</span></Link>
-          <nav aria-label="Learner account" className="flex flex-wrap items-center justify-end gap-1 rounded-xl bg-surface-50 p-1 sm:gap-2">
+          <nav aria-label="Learner account" className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/assessment" aria-label="Assessments"><ClipboardCheck className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Assessments</span></Link></Button>
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/profile" aria-label="Profile"><CircleUserRound className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Profile</span></Link></Button>
             <Button asChild size="sm" className="bg-navy-900 text-white hover:bg-navy-800"><Link href="/dashboard/projects/new" aria-label="New project"><Plus className="size-4 sm:mr-1" /><span className="hidden sm:inline">New project</span></Link></Button>
