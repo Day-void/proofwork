@@ -81,8 +81,8 @@ const details: Record<DashboardKind, {
     subtitle: "Monitor activity and keep the assessment experience consistent for everyone.",
     primary: "Manage assessment roles",
     metrics: [
-      { label: "Active learners", value: "—", note: "Platform metrics will appear here", icon: Users },
-      { label: "Reviews underway", value: "—", note: "Current assessment activity", icon: BookOpenCheck },
+      { label: "Active learners", value: "—", note: "Learner accounts in the workspace", icon: Users },
+      { label: "Reviews underway", value: "—", note: "Assessments currently in progress", icon: BookOpenCheck },
       { label: "Platform status", value: "Ready", note: "Core services configured", icon: Activity },
     ],
     heading: "Recent activity",
@@ -159,7 +159,7 @@ export function DashboardShell({ kind, metricsOverride }: { kind: DashboardKind;
               <div className="px-5 py-12 text-center sm:px-6">
                 <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-accent-50 text-accent-700"><CheckCircle2 size={22} /></div>
                 <h3 className="mt-4 text-sm font-semibold">You’re all caught up</h3>
-                <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-surface-500">{kind === "learner" ? "Your projects and their review progress will appear here." : kind === "assessor" ? "New assignments and submitted reviews will appear here." : "Platform activity and operational updates will appear here."}</p>
+                <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-surface-500">{kind === "learner" ? "Your projects and review progress will be shown here as you work." : kind === "assessor" ? "New assignments and submitted reviews will be shown here." : "Platform activity and operational updates will be shown here."}</p>
                 {kind === "learner" && <Button asChild variant="outline" size="sm" className="mt-5"><Link href="/#how-it-works"><Plus className="mr-1.5 size-3.5" /> Get started</Link></Button>}
               </div>
             </section>
@@ -167,11 +167,11 @@ export function DashboardShell({ kind, metricsOverride }: { kind: DashboardKind;
             {kind === "assessor" && <section id="workspace" className="mt-5 rounded-xl border border-surface-200 bg-white">
               <div className="border-b border-surface-200 px-5 py-4 sm:px-6"><h2 className="font-semibold tracking-tight">Assessment workspace</h2><p className="mt-1 text-xs text-surface-500">The core areas for an independent project review.</p></div>
               <div className="grid gap-3 p-5 sm:grid-cols-3 sm:p-6">{[{ title: "Project evidence", description: "Review the submission and its supporting materials." }, { title: "Rubric criteria", description: "Evaluate each skill against shared expectations." }, { title: "Written feedback", description: "Record clear reasoning and actionable guidance." }].map((item) => <article key={item.title} className="rounded-lg border border-surface-200 bg-surface-50 p-4"><h3 className="text-sm font-semibold">{item.title}</h3><p className="mt-1.5 text-xs leading-5 text-surface-600">{item.description}</p></article>)}</div>
-              <p className="px-5 pb-5 text-xs text-surface-500 sm:px-6">Individual submissions and scoring controls will be connected during the assessment engine phase.</p>
+              <p className="px-5 pb-5 text-xs text-surface-500 sm:px-6">Open an assigned review to examine evidence, apply the rubric, and record clear reasoning.</p>
             </section>}
             {kind === "assessor" && <section id="guidelines" className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><h2 className="font-semibold tracking-tight">Review guidelines</h2><p className="mt-1 text-sm leading-6 text-surface-600">Assess the submitted evidence against the rubric, explain your reasoning, and keep feedback specific and actionable. Independent human judgment remains central to every review.</p></section>}
-            {kind === "admin" && <section id="health" className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><h2 className="font-semibold tracking-tight">Platform health</h2><p className="mt-1 text-sm leading-6 text-surface-600">Operational metrics will be connected during the administration phase. No live service or user data is shown in this preview.</p></section>}
-            {kind === "learner" && <section id="reports" className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><h2 className="font-semibold tracking-tight">Verified reports</h2><p className="mt-1 text-sm leading-6 text-surface-600">Completed assessment reports will appear here when the review workflow is available.</p></section>}
+            {kind === "admin" && <section id="health" className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><h2 className="font-semibold tracking-tight">Platform health</h2><p className="mt-1 text-sm leading-6 text-surface-600">Review account access, assessment activity, audit events, and platform settings from the administration workspace.</p></section>}
+            {kind === "learner" && <section id="reports" className="mt-5 rounded-xl border border-surface-200 bg-white p-5 sm:p-6"><h2 className="font-semibold tracking-tight">Verified reports</h2><p className="mt-1 text-sm leading-6 text-surface-600">Approved reports will be available here and can be shared or withdrawn whenever you choose.</p></section>}
             <p className="mt-5 text-center text-[11px] text-surface-400">Account data is private to your signed-in session.</p>
           </section>
         </div>

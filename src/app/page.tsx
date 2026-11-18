@@ -59,7 +59,7 @@ export default function HomePage() {
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
                   {[{ label: "Portfolio", icon: BriefcaseBusiness }, { label: "Role challenge", icon: Target }, { label: "Human review", icon: ClipboardCheck }].map(({ label, icon: Icon }, index) => <div key={label} className="flex items-center gap-2 rounded-lg bg-surface-50 px-3 py-2.5"><span className="grid size-7 shrink-0 place-items-center rounded-md bg-accent-50 text-accent-700"><Icon size={15} /></span><span className="min-w-0"><span className="block text-xs font-semibold text-navy-900">{label}</span><span className="block text-[10px] text-surface-500">{index === 0 ? "Your real work" : "Planned"}</span></span></div>)}
                 </div>
-                <p className="mt-3 text-[11px] leading-4 text-surface-500">Concept preview. Challenges and assessor reviews are not available yet.</p>
+                <p className="mt-3 text-[11px] leading-4 text-surface-500">A sample view of the portfolio, challenge, and human review journey.</p>
               </div>
             </div>
           </div>
