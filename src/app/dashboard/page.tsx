@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { desc, eq, inArray } from "drizzle-orm";
-import { ArrowRight, BriefcaseBusiness, CircleUserRound, ClipboardCheck, FileCheck2, Plus } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, ClipboardCheck, FileCheck2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WorkspaceMenu } from "@/components/dashboard/workspace-menu";
@@ -35,8 +35,6 @@ export default async function LearnerDashboardPage() {
           <Link href="/" className="font-semibold tracking-tight">proofwork<span className="text-accent-600">.</span></Link>
           <nav aria-label="Learner account" className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
             <Button asChild variant="ghost" size="sm"><Link href="/dashboard/assessment" aria-label="Assessments"><ClipboardCheck className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Assessments</span></Link></Button>
-            <Button asChild variant="ghost" size="sm"><Link href="/dashboard/profile" aria-label="Profile"><CircleUserRound className="size-4 sm:mr-1.5" /><span className="hidden sm:inline">Profile</span></Link></Button>
-            <Button asChild size="sm" className="bg-navy-900 text-white hover:bg-navy-800"><Link href="/dashboard/projects/new" aria-label="New project"><Plus className="size-4 sm:mr-1" /><span className="hidden sm:inline">New project</span></Link></Button>
             <WorkspaceMenu kind="learner" />
           </nav>
         </div>
