@@ -174,7 +174,7 @@ async function saveReview(formData: FormData, submit: boolean) {
     ...(challengeWork?.demoUrl ? ["challenge:demo"] : []),
   ]);
   const ratingSchema = z.enum(["not_yet_demonstrated", "developing", "meets_expectations", "strong", "insufficient_evidence"]);
-  const updates = [];
+  const updates: Array<typeof competencyRating.$inferInsert> = [];
   for (const criterion of criteria) {
     const rawRating = formData.get(`rating:${criterion.id}`);
     const rawRationale = formData.get(`rationale:${criterion.id}`);
@@ -189,17 +189,35 @@ async function saveReview(formData: FormData, submit: boolean) {
     });
   }
   if (submit && updates.length !== criteria.length) throw new Error("Complete every rubric criterion before submitting the review.");
-  for (const update of updates) {
-    await store.insert(competencyRating).values(update).onConflictDoUpdate({
-      target: [competencyRating.reviewId, competencyRating.criterionId],
-      set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
-    });
-  }
   if (!submit) {
+    for (const update of updates) {
+      await store.insert(competencyRating).values(update).onConflictDoUpdate({
+        target: [competencyRating.reviewId, competencyRating.criterionId],
+        set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
+      });
+    }
     revalidatePath(`/assessor/reviews/${reviewId}`);
     redirect(`/assessor/reviews/${reviewId}?saved=1`);
   }
-  await store.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
+  if (transactionalDb) {
+    await transactionalDb.transaction(async (tx) => {
+      for (const update of updates) {
+        await tx.insert(competencyRating).values(update).onConflictDoUpdate({
+          target: [competencyRating.reviewId, competencyRating.criterionId],
+          set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
+        });
+      }
+      await tx.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
+    });
+  } else {
+    for (const update of updates) {
+      await store.insert(competencyRating).values(update).onConflictDoUpdate({
+        target: [competencyRating.reviewId, competencyRating.criterionId],
+        set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
+      });
+    }
+    await store.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
+  }
   const otherReviews = await store.select({ id: assessorReview.id }).from(assessorReview).where(and(
     eq(assessorReview.requestId, review.request.id), eq(assessorReview.status, "submitted"),
   ));
