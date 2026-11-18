@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, lt } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { env } from "@/config/env";
@@ -35,6 +35,9 @@ export async function POST(request: Request) {
   if (!env.OPENAI_API_KEY) return NextResponse.json({ error: "OpenAI is not configured" }, { status: 503 });
   const [aiEnabled] = await db.select({ value: platformSetting.value }).from(platformSetting).where(eq(platformSetting.key, "ai_analysis_enabled")).limit(1);
   if (aiEnabled?.value !== "true") return NextResponse.json({ error: "AI analysis is disabled" }, { status: 503 });
+  const staleBefore = new Date(Date.now() - 10 * 60 * 1000);
+  await db.update(aiAnalysisJob).set({ status: "queued", lastError: "Recovered after worker timeout.", updatedAt: new Date() })
+    .where(and(eq(aiAnalysisJob.status, "running"), lt(aiAnalysisJob.updatedAt, staleBefore)));
   const jobs = await db.select().from(aiAnalysisJob).where(eq(aiAnalysisJob.status, "queued")).orderBy(asc(aiAnalysisJob.createdAt)).limit(3);
   let processed = 0;
   for (const job of jobs) {

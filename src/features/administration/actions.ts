@@ -21,6 +21,7 @@ export async function updateUserRole(formData: FormData) {
   const [target] = await store.select({ id: user.id, role: user.role }).from(user).where(eq(user.id, values.userId)).limit(1);
   if (!target) throw new Error("User not found.");
   await store.update(user).set({ role: values.role, updatedAt: new Date() }).where(eq(user.id, values.userId));
+  await store.delete(authSession).where(eq(authSession.userId, values.userId));
   await store.insert(auditLog).values({ id: crypto.randomUUID(), actorId: actor.user.id, action: "user_role_updated", targetType: "user", targetId: values.userId, details: { oldRole: target.role, newRole: values.role } });
   revalidatePath("/admin/users");
   redirect("/admin/users?updated=1");

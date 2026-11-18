@@ -199,7 +199,9 @@ async function saveReview(formData: FormData, submit: boolean) {
   const [job] = await store.select({ id: aiAnalysisJob.id }).from(aiAnalysisJob).where(eq(aiAnalysisJob.requestId, review.request.id)).limit(1);
   const [request] = await store.select({ consent: verificationRequest.aiAnalysisConsent }).from(verificationRequest).where(eq(verificationRequest.id, review.request.id)).limit(1);
   const [aiEnabled] = await store.select({ value: platformSetting.value }).from(platformSetting).where(eq(platformSetting.key, "ai_analysis_enabled")).limit(1);
-  if (!job && request?.consent && aiEnabled?.value === "true") await store.insert(aiAnalysisJob).values({ id: crypto.randomUUID(), requestId: review.request.id, status: "queued" });
+  if (!job && request?.consent && aiEnabled?.value === "true") {
+    await store.insert(aiAnalysisJob).values({ id: crypto.randomUUID(), requestId: review.request.id, status: "queued" }).onConflictDoNothing({ target: aiAnalysisJob.requestId });
+  }
   if (otherReviews.length >= 2) {
     const submittedIds = otherReviews.map(({ id }) => id);
     const ratings = await store.select().from(competencyRating).where(inArray(competencyRating.reviewId, submittedIds));

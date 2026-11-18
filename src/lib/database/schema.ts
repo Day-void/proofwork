@@ -1,5 +1,6 @@
 import {
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -8,6 +9,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const userRoles = ["learner", "assessor", "moderator", "admin", "employer"] as const;
 export type UserRole = (typeof userRoles)[number];
@@ -113,7 +115,14 @@ export const submissionEvidence = pgTable("submission_evidence", {
   contentType: text("content_type"),
   byteSize: integer("byte_size"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [index("submission_evidence_submission_idx").on(table.submissionId)]);
+}, (table) => [
+  index("submission_evidence_submission_idx").on(table.submissionId),
+  check("submission_evidence_shape_check", sql`(
+    (${table.kind} = 'link' AND ${table.url} IS NOT NULL AND ${table.objectKey} IS NULL)
+    OR
+    (${table.kind} = 'file' AND ${table.objectKey} IS NOT NULL AND ${table.contentType} IS NOT NULL AND ${table.byteSize} IS NOT NULL AND ${table.byteSize} > 0)
+  )`),
+]);
 
 export const assessmentRole = pgTable("assessment_role", {
   id: text("id").primaryKey(),
@@ -194,7 +203,14 @@ export const challengeEvidence = pgTable("challenge_evidence", {
   contentType: text("content_type"),
   byteSize: integer("byte_size"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [index("challenge_evidence_submission_idx").on(table.challengeSubmissionId)]);
+}, (table) => [
+  index("challenge_evidence_submission_idx").on(table.challengeSubmissionId),
+  check("challenge_evidence_shape_check", sql`(
+    (${table.kind} = 'link' AND ${table.url} IS NOT NULL AND ${table.objectKey} IS NULL)
+    OR
+    (${table.kind} = 'file' AND ${table.objectKey} IS NOT NULL AND ${table.contentType} IS NOT NULL AND ${table.byteSize} IS NOT NULL AND ${table.byteSize} > 0)
+  )`),
+]);
 
 export const verificationRequest = pgTable("verification_request", {
   id: text("id").primaryKey(),
@@ -293,7 +309,7 @@ export const aiAnalysisJob = pgTable("ai_analysis_job", {
   lastError: text("last_error"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [index("ai_analysis_job_status_created_idx").on(table.status, table.createdAt), index("ai_analysis_job_request_idx").on(table.requestId)]);
+}, (table) => [index("ai_analysis_job_status_created_idx").on(table.status, table.createdAt), uniqueIndex("ai_analysis_job_request_unique").on(table.requestId)]);
 
 export const competencyRating = pgTable("competency_rating", {
   id: text("id").primaryKey(),

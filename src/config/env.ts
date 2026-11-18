@@ -47,7 +47,20 @@ function getEnv(): Env {
     });
   }
 
-  return parsed.data;
+  const values = parsed.data;
+  if (values.NODE_ENV === "production") {
+    const missing = [
+      ["DATABASE_URL", values.DATABASE_URL],
+      ["BETTER_AUTH_SECRET", values.BETTER_AUTH_SECRET],
+      ["CRON_SECRET", values.CRON_SECRET],
+    ].filter(([, value]) => !value).map(([name]) => name);
+    const localUrls = [values.BETTER_AUTH_URL, values.NEXT_PUBLIC_APP_URL].filter((url) => /localhost|127\.0\.0\.1/.test(url));
+    if (localUrls.length) missing.push("production application URLs");
+    const r2Values = [values.R2_ACCOUNT_ID, values.R2_ACCESS_KEY_ID, values.R2_SECRET_ACCESS_KEY, values.R2_BUCKET_NAME];
+    if (r2Values.some(Boolean) && !r2Values.every(Boolean)) missing.push("complete R2 configuration");
+    if (missing.length) throw new Error(`Missing production configuration: ${missing.join(", ")}`);
+  }
+  return values;
 }
 
 export const env = getEnv();

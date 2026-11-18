@@ -69,14 +69,17 @@ export async function startSubmission(formData: FormData) {
   const [existingDraft] = await database.select({ id: projectSubmission.id }).from(projectSubmission)
     .where(and(eq(projectSubmission.projectId, projectId), eq(projectSubmission.status, "draft"))).limit(1);
   if (existingDraft) redirect(`/dashboard/projects/${projectId}`);
-  const [result] = await database.select({ latest: max(projectSubmission.version) }).from(projectSubmission)
-    .where(eq(projectSubmission.projectId, projectId));
-  const id = crypto.randomUUID();
-  await database.insert(projectSubmission).values({
-    id,
-    projectId,
-    version: (result?.latest ?? 0) + 1,
-  });
+  let created = false;
+  for (let attempt = 0; attempt < 3 && !created; attempt += 1) {
+    const [result] = await database.select({ latest: max(projectSubmission.version) }).from(projectSubmission)
+      .where(eq(projectSubmission.projectId, projectId));
+    try {
+      await database.insert(projectSubmission).values({ id: crypto.randomUUID(), projectId, version: (result?.latest ?? 0) + 1 });
+      created = true;
+    } catch (error) {
+      if (attempt === 2) throw error;
+    }
+  }
   revalidatePath(`/dashboard/projects/${projectId}`);
   redirect(`/dashboard/projects/${projectId}`);
 }

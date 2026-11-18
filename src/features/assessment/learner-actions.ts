@@ -27,10 +27,18 @@ export async function startRoleChallenge(formData: FormData) {
     eq(challengeSubmission.challengeId, challenge.id), eq(challengeSubmission.learnerId, session.user.id), eq(challengeSubmission.status, "draft"),
   )).limit(1);
   if (draft) redirect("/dashboard/assessment");
-  const [latest] = await store.select({ version: max(challengeSubmission.version) }).from(challengeSubmission).where(and(
-    eq(challengeSubmission.challengeId, challenge.id), eq(challengeSubmission.learnerId, session.user.id),
-  ));
-  await store.insert(challengeSubmission).values({ id: crypto.randomUUID(), challengeId: challenge.id, learnerId: session.user.id, version: (latest?.version ?? 0) + 1 });
+  let created = false;
+  for (let attempt = 0; attempt < 3 && !created; attempt += 1) {
+    const [latest] = await store.select({ version: max(challengeSubmission.version) }).from(challengeSubmission).where(and(
+      eq(challengeSubmission.challengeId, challenge.id), eq(challengeSubmission.learnerId, session.user.id),
+    ));
+    try {
+      await store.insert(challengeSubmission).values({ id: crypto.randomUUID(), challengeId: challenge.id, learnerId: session.user.id, version: (latest?.version ?? 0) + 1 });
+      created = true;
+    } catch (error) {
+      if (attempt === 2) throw error;
+    }
+  }
   revalidatePath("/dashboard/assessment");
   redirect("/dashboard/assessment");
 }
