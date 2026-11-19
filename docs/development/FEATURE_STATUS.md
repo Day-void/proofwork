@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; admin bootstrap complete; Playwright smoke coverage added; broader manual review remains)*
+*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; production admin sign-in confirmed; Playwright smoke coverage added; broader manual review remains)*
 
 ## Legend
 
@@ -116,11 +116,11 @@
 |---------|--------|-------|
 | Unit tests | ✅ | Ten native Node tests cover assessment state/scoring and employer task transitions |
 | Integration tests | 🔄 | Disposable Neon schema and workflow contract test passes (`npm run test:integration`); route-handler integration coverage is not configured |
-| E2E tests | 🔄 | Playwright is installed; seven read-only smoke checks cover the landing/registration entry and signed-out guards on all workspaces. Authenticated role approvals, employer tasks, assessment, and storage still need dedicated test accounts and service setup. |
+| E2E tests | 🔄 | Playwright is installed; all seven read-only smoke checks passed against the live deployment on 2026-11-19. They cover landing-to-registration, employer request fields, and signed-out guards for all workspaces. Authenticated role approvals, employer tasks, assessment, and storage still need dedicated test accounts and service setup. |
 | Manual journey checklist | ✅ | `tests/e2e/README.md` defines role approval, privacy, employer-task, assessment, AI consent, account-disable, and responsive journeys |
 | Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass after the current changes |
-| Production build | ✅ | The Vercel build for commit `73e23a0` completed successfully. A local Windows sandbox build hit filesystem `EPERM` during prerender; the hosted build is the release verification. |
-| Deployment config | ✅ | Commit `73e23a0` is deployed to `proofwork-steel.vercel.app`; production page smoke checks returned HTTP 200. Daily worker schedule is configured; runtime behavior still needs owner review in Vercel logs. |
+| Production build | ✅ | The Vercel build for commit `89e4351` completed successfully. A local Windows sandbox build hit filesystem `EPERM` during prerender; the hosted build is the release verification. |
+| Deployment config | ✅ | Commit `89e4351` is deployed to `proofwork-steel.vercel.app`; production page smoke checks returned HTTP 200 and the admin sign-in was confirmed by the owner. Daily worker schedule is configured; runtime behavior still needs owner review in Vercel logs. |
 
 ## Known Security Advisories
 
@@ -138,5 +138,5 @@
 - Manual browser review of the updated signup, access approval, employer task, learner task, responsive, and keyboard journeys remains pending.
 - Local Resend and cron values are present but delivery/job execution are unverified; OpenAI and R2 values are absent locally. Vercel previously reported the core Neon/auth/app URL/cron variable names as already present, but their values and runtime behavior still need owner verification.
 - The test branch has a dedicated admin account; the manual registration/access-request and employer-task journeys still need to be exercised in the browser.
-- The Vercel cron runtime check, browser end-to-end journeys, and manual accessibility review remain owner/reviewer actions.
-- Automated browser E2E and route-handler integration suites are not installed; the database contract test and manual journey checklist exist, and employer task state rules are covered by unit tests.
+- The Vercel cron runtime check, authenticated browser journeys beyond admin user-list access, and manual accessibility review remain owner/reviewer actions. The owner confirmed the admin hamburger menu opens User management and the user list loads; access-request review actions still need a test request.
+- Playwright browser smoke tests and a disposable-Neon database contract test are installed. Route-handler integration coverage is not configured; employer task state rules are covered by unit tests.

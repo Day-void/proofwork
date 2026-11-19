@@ -107,9 +107,9 @@ Resend did not respond from the user's network during prior setup, and no owned 
 
 ## 7. Deployment status and remaining owner checks
 
-1. Commit `73e23a0` has been pushed and deployed to `proofwork-steel.vercel.app`; the Vercel deployment completed and the public pages returned HTTP 200.
-2. The Production migrations are applied, and `maringisanwaday@gmail.com` is now an active admin. Its existing session was revoked by the bootstrap; sign in again. Its email is currently unverified because ProofWork does not yet enforce or send email verification at signup.
+1. Commit `89e4351` has been pushed and deployed to `proofwork-steel.vercel.app`; the Vercel deployment completed, the public pages returned HTTP 200, and the owner confirmed that admin sign-in opens the admin dashboard.
+2. The Production migrations are applied, and `maringisanwaday@gmail.com` is an active admin. Its email is currently unverified because ProofWork does not yet enforce or send email verification at signup.
 3. Confirm the Production environment variables and daily cron behavior in Vercel.
-4. Complete the manual journeys in `tests/e2e/README.md`, including signup, learner projects, role approval, employer invitations, assessor review, and admin controls.
+4. Complete the manual journeys in `tests/e2e/README.md`, including signup, learner projects, role approval, employer invitations, assessor review, User management, and admin controls.
 
 Employer discovery and AI remain off until an administrator enables them. R2 and Resend are optional integrations; R2 requires accepting usage-based billing and Resend delivery requires a verified sender domain.
