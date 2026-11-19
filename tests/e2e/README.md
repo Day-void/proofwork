@@ -10,6 +10,7 @@ After applying the branch migrations, you can run the database contract check wi
 
 - One administrator, one learner, one employer applicant, and one assessor applicant.
 - The disposable test branch already has a dedicated administrator account provisioned by the project owner. Use that account for admin journeys. If its access is unavailable, recover it through the owner's trusted process; do not promote an applicant or use public signup to self-assign a role. Never make test-account role changes on Production.
+- Keep signup and admin review on the same deployment and Neon branch. Neon test branches are isolated from Production, so a request created against one branch will not appear in the other branch's admin queue. The success notice means the request action returned successfully; the account intentionally remains a learner until approval, then the applicant must sign in again after the old session is revoked. If the notice appears but the admin queue is empty, compare the active deployment's `DATABASE_URL` branch for signup and admin before retrying.
 - If the local app starts on a port other than 3000, set `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL` to that same local origin before restarting it; Better Auth rejects sign-in requests from untrusted origins.
 - One discoverable learner with an approved role, plus one learner who has not opted in (to verify privacy filtering).
 - Employer discovery and new assessments enabled only in the test environment.
