@@ -3,12 +3,13 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { Pool } from "@neondatabase/serverless";
 
-const testDatabaseUrl = process.env.TEST_DATABASE_URL_UNPOOLED?.trim() || undefined;
+const rawTestDatabaseUrl = process.env.TEST_DATABASE_URL_UNPOOLED?.trim();
+const testDatabaseUrl = rawTestDatabaseUrl?.replace(/^(['"])(.*)\1$/, "$2") || undefined;
 
 test("Neon workspace access and employer task schema supports the intended lifecycle", {
   skip: !testDatabaseUrl,
 }, async () => {
-  const pool = new Pool({ connectionString: testDatabaseUrl, max: 1 });
+  let pool;
   let client;
   const employerId = randomUUID();
   const learnerId = randomUUID();
@@ -17,7 +18,12 @@ test("Neon workspace access and employer task schema supports the intended lifec
   const approvalRequestId = randomUUID();
 
   try {
-    client = await pool.connect();
+    try {
+      pool = new Pool({ connectionString: testDatabaseUrl, max: 1 });
+      client = await pool.connect();
+    } catch {
+      throw new Error("Could not connect to TEST_DATABASE_URL_UNPOOLED. Check that it is a valid, unquoted test-branch URL; connection details are suppressed.");
+    }
     await client.query("BEGIN");
     await client.query(
       `INSERT INTO "user" (id, name, email) VALUES ($1, 'Integration employer', $2), ($3, 'Integration learner', $4)`,
@@ -159,7 +165,7 @@ test("Neon workspace access and employer task schema supports the intended lifec
         }
       }
     } finally {
-      await pool.end();
+      await pool?.end();
     }
   }
 });
