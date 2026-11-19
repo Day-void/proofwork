@@ -52,9 +52,28 @@ Do not run the migration in a terminal until you have checked which Neon branch 
 
 1. Create a normal account at `/register` and choose the appropriate workspace request.
 2. Supply an organization and a clear reason for access. The account remains a learner until approved.
-3. The disposable branch `proofwork-feature-test` has a dedicated test administrator. The Production database currently has no admin account, and `maringisanwaday@gmail.com` is not registered there. Register that address at `https://proofwork-steel.vercel.app/register`, then use the trusted owner bootstrap to grant it admin access. Do not set an elevated role through public signup.
-4. Review the applicant and reason; approve or decline. Approval changes the role and marks the request in the same database statement, then revokes existing sessions.
-5. Ask the applicant to sign in again. Their workspace navigation is based on their current server-side role.
+3. The disposable branch `proofwork-feature-test` has a dedicated test administrator. The Production database currently has no admin account, and `maringisanwaday@gmail.com` is not registered there. Register that address at `https://proofwork-steel.vercel.app/register` and verify that email in the live app. Do not select an elevated role during signup.
+4. In the Neon SQL Editor, select Production branch `br-cold-hill-beami78w` and run this one statement. It only promotes that exact registered email, revokes its existing sessions, and returns a row only if the account exists:
+
+   ```sql
+   WITH promoted AS (
+     UPDATE "user"
+     SET role = 'admin', updated_at = now()
+     WHERE lower(email) = lower('maringisanwaday@gmail.com')
+     RETURNING id, email, role
+   ), revoked AS (
+     DELETE FROM "session" AS s
+     USING promoted AS p
+     WHERE s.user_id = p.id
+     RETURNING s.id
+   )
+   SELECT p.email, p.role, (SELECT count(*) FROM revoked) AS revoked_sessions
+   FROM promoted AS p;
+   ```
+
+   Confirm it returns exactly one row with the intended email and `admin` role. If it returns no row, the account has not registered on Production; stop and register it first. Do not change any other account's role.
+5. Sign in again at the live site; the refreshed session should open the admin workspace. Open the hamburger menu and choose **User management**.
+6. For employer or assessor requests, review the applicant and reason; approval changes the role and marks the request in the same database statement, then revokes existing sessions. Ask the applicant to sign in again.
 
 If the initial administrator account or credentials are unavailable, recover access through the existing trusted admin process. Do not send passwords or connection strings in chat.
 
