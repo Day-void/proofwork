@@ -1,6 +1,17 @@
 # End-to-end journey checklist
 
-The Playwright smoke suite covers the public landing/registration entry and signed-out route guards. It performs only page reads and form-control changes; it does not submit accounts or mutate Production data. Run it with `npm run test:e2e`. Playwright uses installed Google Chrome stable by default; if Chrome is unavailable, install Playwright Chromium with `npx playwright install chromium` and set `PLAYWRIGHT_BROWSER_CHANNEL=chromium`. The default target is the live public deployment; set `PLAYWRIGHT_BASE_URL` to a local or preview deployment to change the target.
+The default Playwright smoke suite covers the public landing/registration entry and signed-out route guards. It performs only page reads and form-control changes; it does not submit accounts or mutate Production data. Run it with `npm run test:e2e`. Playwright uses installed Google Chrome stable by default; if Chrome is unavailable, install Playwright Chromium with `npx playwright install chromium` and set `PLAYWRIGHT_BROWSER_CHANNEL=chromium`. The default target is the live public deployment; set `PLAYWRIGHT_BASE_URL` to a local or preview deployment to change the target.
+
+An additional opt-in mutation test submits an employer signup request and checks directly that the account remains a learner while its request is pending. It is disabled unless `PLAYWRIGHT_TEST_MUTATIONS=1`, requires `PLAYWRIGHT_BASE_URL` to be a local origin, and checks that `TEST_DATABASE_URL_UNPOOLED` targets the known `proofwork-feature-test` Neon endpoint before creating anything. It uses a unique `.invalid` email and deletes the synthetic account afterward. Do not weaken these guards or point the test database variable at Production. Start the local app with `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL` set to its local URL, then run the test with the mutation flag and test-branch URL set in the same shell. For example, in PowerShell:
+
+```powershell
+$env:PLAYWRIGHT_BASE_URL = "http://localhost:3000"
+$env:PLAYWRIGHT_TEST_MUTATIONS = "1"
+$env:TEST_DATABASE_URL_UNPOOLED = "<direct URL for the proofwork-feature-test Neon branch>"
+npm run test:e2e -- --grep "employer signup creates"
+```
+
+Unset the mutation flag after the run. A successful test verifies request creation only; administrator approval, role switching after a fresh sign-in, and the employer task invitation/response/feedback journey remain separate checks.
 
 The broader role and task journeys below remain manual and must run on a non-production deployment connected to a disposable Neon branch and dedicated test accounts. Do not test with real learner documents or personal information.
 
