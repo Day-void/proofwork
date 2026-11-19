@@ -90,6 +90,7 @@ These actions require access to the corresponding owner/admin consoles and canno
 | `npm run typecheck` | Run TypeScript checks |
 | `npm run test:unit` | Run native Node unit tests (assessment rules and employer task states) |
 | `npm run test:integration` | Run Neon schema integration checks when `TEST_DATABASE_URL_UNPOOLED` points to a disposable test branch; otherwise the suite is skipped |
+| `npm run test:e2e` | Run Playwright smoke checks for the public entry, workspace request fields, and signed-out route protection |
 | `npm run db:generate` | Generate a migration from the Drizzle schema |
 | `npm run db:migrate` | Apply pending migrations to the configured database |
 | `npm run db:studio` | Open Drizzle Studio |
@@ -114,7 +115,7 @@ These actions require access to the corresponding owner/admin consoles and canno
 
 ## Testing and release notes
 
-Run `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:integration`, and `npm run build` before release. Set `TEST_DATABASE_URL_UNPOOLED` only to a disposable Neon test branch when running integration checks; those checks use a transaction and roll back their sample data. Manual end-to-end checks still need test accounts and service credentials; the checklist is in `tests/e2e/README.md`. Verify the migration on a non-production Neon branch first, test role approval with a non-admin account, and check the learner's task invite / submit / feedback journey before enabling employer discovery in production.
+Run `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run test:integration`, `npm run test:e2e`, and `npm run build` before release. Set `TEST_DATABASE_URL_UNPOOLED` only to a disposable Neon test branch when running integration checks; those checks use a transaction and roll back their sample data. Playwright's credential-free smoke tests default to the live public site; use `PLAYWRIGHT_BASE_URL` to target a local or preview deployment. The broader role approval and employer-task journeys still need dedicated test accounts and are documented in `tests/e2e/README.md`. Verify migrations on a non-production Neon branch first, test role approval with a non-admin account, and check the learner's task invite / submit / feedback journey before enabling employer discovery in production.
 
 ## Documentation
 

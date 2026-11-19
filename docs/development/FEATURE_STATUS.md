@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; docs deployed; Production admin bootstrap complete; manual product review remains)*
+*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; admin bootstrap complete; Playwright smoke coverage added; broader manual review remains)*
 
 ## Legend
 
@@ -116,7 +116,7 @@
 |---------|--------|-------|
 | Unit tests | ✅ | Ten native Node tests cover assessment state/scoring and employer task transitions |
 | Integration tests | 🔄 | Disposable Neon schema and workflow contract test passes (`npm run test:integration`); route-handler integration coverage is not configured |
-| E2E tests | ⬜ | Hosted auth/storage journeys need production-like credentials and browser runner setup |
+| E2E tests | 🔄 | Playwright is installed; seven read-only smoke checks cover the landing/registration entry and signed-out guards on all workspaces. Authenticated role approvals, employer tasks, assessment, and storage still need dedicated test accounts and service setup. |
 | Manual journey checklist | ✅ | `tests/e2e/README.md` defines role approval, privacy, employer-task, assessment, AI consent, account-disable, and responsive journeys |
 | Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass after the current changes |
 | Production build | ✅ | The Vercel build for commit `73e23a0` completed successfully. A local Windows sandbox build hit filesystem `EPERM` during prerender; the hosted build is the release verification. |

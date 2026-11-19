@@ -1,6 +1,8 @@
 # End-to-end journey checklist
 
-There is no browser automation runner installed in this repository yet. Use this checklist on a non-production deployment connected to a disposable Neon branch and dedicated test accounts. Do not test with real learner documents or personal information.
+The Playwright smoke suite covers the public landing/registration entry and signed-out route guards. It performs only page reads and form-control changes; it does not submit accounts or mutate Production data. Run it with `npm run test:e2e`. Playwright uses installed Google Chrome stable by default; if Chrome is unavailable, install Playwright Chromium with `npx playwright install chromium` and set `PLAYWRIGHT_BROWSER_CHANNEL=chromium`. The default target is the live public deployment; set `PLAYWRIGHT_BASE_URL` to a local or preview deployment to change the target.
+
+The broader role and task journeys below remain manual and must run on a non-production deployment connected to a disposable Neon branch and dedicated test accounts. Do not test with real learner documents or personal information.
 
 After applying the branch migrations, you can run the database contract check with `TEST_DATABASE_URL_UNPOOLED` set to that disposable branch and `npm run test:integration`. It creates synthetic rows inside a transaction and rolls them back. Never point this variable at Production.
 
