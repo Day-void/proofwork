@@ -52,7 +52,7 @@ Do not run the migration in a terminal until you have checked which Neon branch 
 
 1. Create a normal account at `/register` and choose the appropriate workspace request.
 2. Supply an organization and a clear reason for access. The account remains a learner until approved.
-3. The disposable branch `proofwork-feature-test` has a dedicated test administrator. The Production database currently has no admin account, and `maringisanwaday@gmail.com` is not registered there. Register that address at `https://proofwork-steel.vercel.app/register` and verify that email in the live app. Do not select an elevated role during signup.
+3. The disposable branch `proofwork-feature-test` has a dedicated test administrator. For the Production bootstrap, register the intended address at `https://proofwork-steel.vercel.app/register` and make sure you control that account. Public signup only grants the learner role. ProofWork currently does not require or send email verification at signup; the `email_verified` flag remains false unless a verification flow is completed.
 4. In the Neon SQL Editor, select Production branch `br-cold-hill-beami78w` and run this one statement. It only promotes that exact registered email, revokes its existing sessions, and returns a row only if the account exists:
 
    ```sql
@@ -71,7 +71,7 @@ Do not run the migration in a terminal until you have checked which Neon branch 
    FROM promoted AS p;
    ```
 
-   Confirm it returns exactly one row with the intended email and `admin` role. If it returns no row, the account has not registered on Production; stop and register it first. Do not change any other account's role.
+   Confirm it returns exactly one row with the intended email and `admin` role. If it returns no row, the account has not registered on Production; stop and register it first. Do not change any other account's role, and do not manually set `email_verified` to true.
 5. Sign in again at the live site; the refreshed session should open the admin workspace. Open the hamburger menu and choose **User management**.
 6. For employer or assessor requests, review the applicant and reason; approval changes the role and marks the request in the same database statement, then revokes existing sessions. Ask the applicant to sign in again.
 
@@ -108,7 +108,7 @@ Resend did not respond from the user's network during prior setup, and no owned 
 ## 7. Deployment status and remaining owner checks
 
 1. Commit `73e23a0` has been pushed and deployed to `proofwork-steel.vercel.app`; the Vercel deployment completed and the public pages returned HTTP 200.
-2. The Production migrations are applied. The Production database currently has no admin account, and `maringisanwaday@gmail.com` is not registered there. Register that address at `https://proofwork-steel.vercel.app/register`, then use the trusted owner bootstrap to grant it admin access.
+2. The Production migrations are applied, and `maringisanwaday@gmail.com` is now an active admin. Its existing session was revoked by the bootstrap; sign in again. Its email is currently unverified because ProofWork does not yet enforce or send email verification at signup.
 3. Confirm the Production environment variables and daily cron behavior in Vercel.
 4. Complete the manual journeys in `tests/e2e/README.md`, including signup, learner projects, role approval, employer invitations, assessor review, and admin controls.
 

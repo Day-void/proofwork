@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; commit 73e23a0 deployed; Production admin bootstrap and manual product review remain)*
+*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; docs deployed; Production admin bootstrap complete; manual product review remains)*
 
 ## Legend
 
@@ -134,9 +134,9 @@
 
 ## Technical Blockers
 
-- Production currently has no administrator. `maringisanwaday@gmail.com` must register on the live site before the trusted owner bootstrap can grant that account admin access.
+- Production admin bootstrap is complete for `maringisanwaday@gmail.com`; the account is active, but its email remains unverified because signup verification is not configured.
 - Manual browser review of the updated signup, access approval, employer task, learner task, responsive, and keyboard journeys remains pending.
 - Local Resend and cron values are present but delivery/job execution are unverified; OpenAI and R2 values are absent locally. Vercel previously reported the core Neon/auth/app URL/cron variable names as already present, but their values and runtime behavior still need owner verification.
 - The test branch has a dedicated admin account; the manual registration/access-request and employer-task journeys still need to be exercised in the browser.
-- The Production admin account bootstrap, Vercel cron runtime check, browser end-to-end journeys, and manual accessibility review remain owner/reviewer actions.
+- The Vercel cron runtime check, browser end-to-end journeys, and manual accessibility review remain owner/reviewer actions.
 - Automated browser E2E and route-handler integration suites are not installed; the database contract test and manual journey checklist exist, and employer task state rules are covered by unit tests.
