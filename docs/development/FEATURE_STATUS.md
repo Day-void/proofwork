@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-19 (test-branch migrations, Neon contract check, and dedicated test admin setup completed; manual product review and provider setup remain)*
+*Last updated: 2026-11-19 (migrations 0010–0012 applied to test and Production; commit 73e23a0 deployed; Production admin bootstrap and manual product review remain)*
 
 ## Legend
 
@@ -52,7 +52,7 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Database schema | ✅ | Auth tables, learner-default role, and foreign keys defined with Drizzle |
-| Database migrations | ✅ | Existing migrations remain on Neon; new workspace-access and employer-task migrations 0010–0012 were applied and verified on disposable branch `proofwork-feature-test`. Production remains pending review. |
+| Database migrations | ✅ | Migrations 0010–0012 were applied and verified on `proofwork-feature-test` and Production branch `br-cold-hill-beami78w` on 2026-11-19. |
 | Better Auth integration | ✅ | Neon HTTP adapter, Next route handler, and secure session policy |
 | User registration | ✅ | Email/password registration; role is server-controlled and defaults to learner |
 | Employer/assessor access requests | ✅ | Signup captures requested workspace; admins approve or decline at `/admin/users`; elevated roles are not self-assigned |
@@ -119,8 +119,8 @@
 | E2E tests | ⬜ | Hosted auth/storage journeys need production-like credentials and browser runner setup |
 | Manual journey checklist | ✅ | `tests/e2e/README.md` defines role approval, privacy, employer-task, assessment, AI consent, account-disable, and responsive journeys |
 | Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass after the current changes |
-| Production build | 🔄 | The latest isolated build compiled and passed TypeScript, but prerendering failed when Windows returned `EPERM` creating a generated `.next/server/app/*.segments` directory, even outside OneDrive and with one build worker. The Codex sandbox's temporary path also contains `!`, which Webpack rejects. Run the full build from a regular local terminal or CI to verify. |
-| Deployment config | 🔄 | The app is live at `proofwork-steel.vercel.app` and `vercel.json` schedules the worker daily. The local checkout is not linked to the Vercel project; the owner needs to verify existing Production variables and cron behavior. |
+| Production build | ✅ | The Vercel build for commit `73e23a0` completed successfully. A local Windows sandbox build hit filesystem `EPERM` during prerender; the hosted build is the release verification. |
+| Deployment config | ✅ | Commit `73e23a0` is deployed to `proofwork-steel.vercel.app`; production page smoke checks returned HTTP 200. Daily worker schedule is configured; runtime behavior still needs owner review in Vercel logs. |
 
 ## Known Security Advisories
 
@@ -134,10 +134,9 @@
 
 ## Technical Blockers
 
+- Production currently has no administrator. `maringisanwaday@gmail.com` must register on the live site before the trusted owner bootstrap can grant that account admin access.
 - Manual browser review of the updated signup, access approval, employer task, learner task, responsive, and keyboard journeys remains pending.
 - Local Resend and cron values are present but delivery/job execution are unverified; OpenAI and R2 values are absent locally. Vercel previously reported the core Neon/auth/app URL/cron variable names as already present, but their values and runtime behavior still need owner verification.
 - The test branch has a dedicated admin account; the manual registration/access-request and employer-task journeys still need to be exercised in the browser.
-- The latest isolated production build compiled and passed TypeScript, then hit a Windows `EPERM` creating a generated `.segments` directory during prerendering, even outside OneDrive with one worker. The Codex sandbox's temporary path is also incompatible with Webpack because it contains `!`; verify the full build in a regular local terminal or CI.
-- Migrations `0010_little_tag.sql` through `0012_real_mother_askani.sql` are applied to `proofwork-feature-test`; they have not been applied to Production.
-- Vercel/browser end-to-end runs, the new signup and employer-task journeys, and manual accessibility review remain to be performed against a test deployment.
+- The Production admin account bootstrap, Vercel cron runtime check, browser end-to-end journeys, and manual accessibility review remain owner/reviewer actions.
 - Automated browser E2E and route-handler integration suites are not installed; the database contract test and manual journey checklist exist, and employer task state rules are covered by unit tests.

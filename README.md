@@ -70,7 +70,7 @@ If AI assistance is missing, check the learner's consent, the admin setting, `OP
 
 The repository contains the integrations, but production use requires account-level setup:
 
-- **Neon:** Set pooled `DATABASE_URL` for app traffic and direct `DATABASE_URL_UNPOOLED` for migrations. Review the pending migration before applying it to the production branch.
+- **Neon:** Set pooled `DATABASE_URL` for app traffic and direct `DATABASE_URL_UNPOOLED` for migrations. Migrations through `0012` are applied to Production; review and test any future migration before applying it to the production branch.
 - **Better Auth:** Set a private `BETTER_AUTH_SECRET` (32+ characters), `BETTER_AUTH_URL`, and `NEXT_PUBLIC_APP_URL` to the deployed app URL.
 - **Vercel:** ProofWork already has a live deployment at `proofwork-steel.vercel.app`. Verify its existing Production variables and daily Hobby cron before any new deployment; this local checkout is not linked to the Vercel project CLI. The core Neon/auth/URL/cron variable names were reported as already present, but their values and runtime behavior still need owner verification.
 - **AI:** Set `OPENAI_API_KEY`, choose `OPENAI_MODEL` if needed, confirm `CRON_SECRET` exists for the same deployment target, and enable the feature from the admin dashboard only after reviewing consent and AI operations.
