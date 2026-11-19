@@ -36,7 +36,6 @@ const nav: Record<DashboardKind, { label: string; href: string; icon: LucideIcon
     { label: "Overview", href: "/admin", icon: LayoutDashboard },
     { label: "Assessment roles", href: "/admin/roles", icon: BookOpenCheck },
     { label: "Assessment operations", href: "/admin/assessments", icon: FileCheck2 },
-    { label: "Users", href: "/admin/users", icon: Users },
     { label: "Audit log", href: "/admin/audit", icon: Activity },
     { label: "Platform settings", href: "/admin/settings", icon: CircleHelp },
     { label: "Platform health", href: "/admin#health", icon: Activity },

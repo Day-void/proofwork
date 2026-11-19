@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-*Last updated: 2026-11-16 (assessment lifecycle, reporting, operations, storage, and AI assistance implemented)*
+*Last updated: 2026-11-19 (access requests and employer-authored task workflow added; Neon migration and service setup remain)*
 
 ## Phase 0 — Foundation & Final Foundation Audit ✅
 
@@ -89,6 +89,7 @@
 
 - [x] Admin dashboard with platform statistics
 - [x] User management (account listing, role assignment, access disable/enable)
+- [x] Employer/assessor workspace access requests with admin approval; public registration still grants learner role only
 - [x] Submission and assessment oversight
 - [x] Rubric management interface
 - [x] Audit log viewer
@@ -96,12 +97,15 @@
 - [x] Employer access to learner-opted-in discoverable profiles
 - [x] Private report sharing and employer report verification view
 - [x] Learner visibility controls and access revocation
+- [x] Employer-authored, learner-accepted role tasks with private response and feedback flow
 
 ## Phase 7 — Testing & Deployment
 
 - [x] Unit tests for business logic and scoring algorithms (native Node test runner)
+- [x] Neon integration contract for the workspace access and employer task schema/lifecycles on disposable branch `proofwork-feature-test`
 - [ ] Integration tests for API route handlers
 - [ ] End-to-end tests for critical learner and assessor journeys
+- [x] Apply and verify migrations on a disposable Neon branch; manual browser journeys still need an account owner
 - [x] Resolve TypeScript and lint errors
 - [x] Production build
 - [x] Vercel deployment configuration (scheduled AI worker; hosting project and environment still need setup)

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
+import { requestWorkspaceAccess } from "@/features/users/access-actions";
 
 type AuthMode = "login" | "register" | "forgot-password" | "reset-password";
 
@@ -38,6 +39,7 @@ export function AuthPanel({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [requestedRole, setRequestedRole] = useState<"learner" | "employer" | "assessor">("learner");
   const tokenIsMissing = mode === "reset-password" && !token;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -61,7 +63,20 @@ export function AuthPanel({
       } else if (mode === "register") {
         const result = await authClient.signUp.email({ email, password, name });
         if (result.error) throw new Error(result.error.message);
-        router.replace("/dashboard");
+        if (requestedRole !== "learner") {
+          const accessRequest = new FormData();
+          accessRequest.set("requestedRole", requestedRole);
+          accessRequest.set("organization", String(form.get("organization") ?? ""));
+          accessRequest.set("reason", String(form.get("accessReason") ?? ""));
+          try {
+            await requestWorkspaceAccess(accessRequest);
+            router.replace("/dashboard?accessRequestSubmitted=1");
+          } catch {
+            router.replace("/dashboard?accessRequestFailed=1");
+          }
+        } else {
+          router.replace("/dashboard");
+        }
         router.refresh();
       } else if (mode === "forgot-password") {
         const result = await authClient.requestPasswordReset({
@@ -95,6 +110,8 @@ export function AuthPanel({
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           {mode !== "reset-password" && <div className="space-y-2"><Label htmlFor="email">Email address</Label><Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></div>}
           {mode === "register" && <div className="space-y-2"><Label htmlFor="name">Your name</Label><Input id="name" name="name" autoComplete="name" placeholder="How should we address you?" required /></div>}
+          {mode === "register" && <div className="space-y-2"><Label htmlFor="workspaceRole">What brings you to ProofWork?</Label><select id="workspaceRole" name="workspaceRole" value={requestedRole} onChange={(event) => setRequestedRole(event.target.value as typeof requestedRole)} className="min-h-10 w-full rounded-lg border border-surface-200 bg-white px-3 text-sm"><option value="learner">I’m building my skills portfolio</option><option value="employer">I’m hiring or evaluating talent</option><option value="assessor">I want to review learner work</option></select><p className="text-xs leading-5 text-surface-500">Employer and assessor workspaces need approval. Every new account starts as a learner, so choosing one here never grants elevated access by itself.</p></div>}
+          {mode === "register" && requestedRole !== "learner" && <><div className="space-y-2"><Label htmlFor="organization">Organization</Label><Input id="organization" name="organization" maxLength={160} placeholder="Company, school, or independent practice" /></div><div className="space-y-2"><Label htmlFor="accessReason">Why do you need this workspace?</Label><textarea id="accessReason" name="accessReason" minLength={20} maxLength={2000} required className="min-h-24 w-full rounded-lg border border-surface-200 bg-white px-3 py-2 text-sm" placeholder="Tell us how you plan to use ProofWork (at least 20 characters)." /></div></>}
           {isPasswordMode && <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="password">{mode === "reset-password" ? "New password" : "Password"}</Label>{mode === "login" && <Link href="/forgot-password" className="text-xs font-medium text-accent-700 hover:text-accent-800">Forgot password?</Link>}</div><Input id="password" name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} maxLength={128} placeholder="At least 8 characters" required /></div>}
           {mode === "reset-password" && <div className="space-y-2"><Label htmlFor="confirmPassword">Confirm new password</Label><Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" minLength={8} maxLength={128} placeholder="Enter the new password again" required /></div>}
           {mode === "forgot-password" && !emailConfigured && <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">Password recovery email is not configured yet. Ask your administrator to finish email setup.</p>}

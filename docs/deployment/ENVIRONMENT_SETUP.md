@@ -6,6 +6,7 @@ Set these values in the hosting provider's encrypted environment settings. Do no
 
 - `DATABASE_URL`: Neon pooled connection string for application requests.
 - `DATABASE_URL_UNPOOLED`: Neon direct connection string for migrations.
+- Assessment workflows that must update related records together (conflict disclosure, assessor review save/submit and moderation checks, final decisions and audit events, appeals, report-share creation/revocation, and learner discoverability changes) require this direct URL because Neon HTTP does not support interactive transactions. The app rejects those writes with a configuration error if the direct connection is unavailable; it does not fall back to a non-transactional adapter.
 - `BETTER_AUTH_SECRET`: unique random value of at least 32 characters.
 - `BETTER_AUTH_URL` and `NEXT_PUBLIC_APP_URL`: the canonical HTTPS app origin.
 - Apply migrations with `npm run db:migrate` before deploying the matching application version.
@@ -37,4 +38,4 @@ New assessment requests, employer discovery, and AI assistance are off until an 
 
 ## Remaining launch work
 
-Provision production credentials, verify the email sender, set exact R2 CORS origins, choose the OpenAI model and retention settings, configure the Vercel project and domain, and run the deployment checklist against the production environment. Keyboard and screen reader review also requires a human using assistive technology.
+The app is already live at `proofwork-steel.vercel.app`. The local checkout is not linked to the Vercel project, so an owner still needs to verify the existing Production variables and daily cron in Vercel; the core Neon/auth/app URL/cron variable names were reported as already present. Add an OpenAI key only if enabling AI, configure R2 only if accepting uploads, and verify Resend delivery only after a sender domain is available. Review any pending migration before applying it to Production. Keyboard and screen reader review also requires a human using assistive technology.

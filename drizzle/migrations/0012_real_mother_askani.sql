@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "workspace_access_request_pending_user_role_unique" ON "workspace_access_request" USING btree ("user_id","requested_role") WHERE "workspace_access_request"."status" = 'pending';

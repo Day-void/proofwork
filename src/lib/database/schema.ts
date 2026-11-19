@@ -316,6 +316,46 @@ export const platformSetting = pgTable("platform_setting", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const workspaceAccessRequest = pgTable("workspace_access_request", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  requestedRole: text("requested_role").$type<"employer" | "assessor">().notNull(),
+  organization: text("organization"),
+  reason: text("reason").notNull(),
+  status: text("status").$type<"pending" | "approved" | "declined">().notNull().default("pending"),
+  reviewedBy: text("reviewed_by").references(() => user.id, { onDelete: "set null" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("workspace_access_request_status_created_idx").on(table.status, table.createdAt),
+  index("workspace_access_request_user_idx").on(table.userId),
+  uniqueIndex("workspace_access_request_pending_user_role_unique").on(table.userId, table.requestedRole)
+    .where(sql`${table.status} = 'pending'`),
+  check("workspace_access_request_role_check", sql`${table.requestedRole} IN ('employer', 'assessor')`),
+  check("workspace_access_request_status_check", sql`${table.status} IN ('pending', 'approved', 'declined')`),
+]);
+
+export const employerTask = pgTable("employer_task", {
+  id: text("id").primaryKey(),
+  employerId: text("employer_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  learnerId: text("learner_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  skillArea: text("skill_area").notNull(),
+  instructions: text("instructions").notNull(),
+  criteria: text("criteria").notNull(),
+  dueAt: timestamp("due_at", { withTimezone: true }),
+  status: text("status").$type<"invited" | "accepted" | "declined" | "submitted" | "reviewed">().notNull().default("invited"),
+  learnerResponse: text("learner_response"),
+  evidenceUrl: text("evidence_url"),
+  employerFeedback: text("employer_feedback"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("employer_task_employer_status_idx").on(table.employerId, table.status),
+  index("employer_task_learner_status_idx").on(table.learnerId, table.status),
+  check("employer_task_status_check", sql`${table.status} IN ('invited', 'accepted', 'declined', 'submitted', 'reviewed')`),
+]);
+
 export const aiAnalysisJob = pgTable("ai_analysis_job", {
   id: text("id").primaryKey(),
   requestId: text("request_id").notNull().references(() => verificationRequest.id, { onDelete: "cascade" }),
@@ -344,6 +384,8 @@ export const competencyRating = pgTable("competency_rating", {
 export const databaseSchema = {
   ...authSchema,
   learnerProfile,
+  workspaceAccessRequest,
+  employerTask,
   learnerProject,
   projectSubmission,
   submissionEvidence,

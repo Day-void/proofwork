@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { WorkspaceMenu } from "@/components/dashboard/workspace-menu";
 import { requireRole } from "@/lib/auth/guards";
 import { db } from "@/lib/database";
-import { learnerProject, projectSubmission } from "@/lib/database/schema";
+import { employerTask, learnerProject, projectSubmission } from "@/lib/database/schema";
 
 export const metadata: Metadata = { title: "Learner workspace" };
 
-export default async function LearnerDashboardPage() {
+export default async function LearnerDashboardPage({ searchParams }: { searchParams: Promise<{ accessRequestSubmitted?: string; accessRequestFailed?: string }> }) {
   const session = await requireRole(["learner"]);
+  const query = await searchParams;
   if (!db) throw new Error("The learner workspace requires a configured database.");
   const projects = await db.select().from(learnerProject)
     .where(eq(learnerProject.learnerId, session.user.id)).orderBy(desc(learnerProject.updatedAt));
@@ -27,6 +28,8 @@ export default async function LearnerDashboardPage() {
     byProject.set(submission.projectId, counts);
   }
   const submittedCount = submissions.filter((submission) => submission.status === "submitted").length;
+  const tasks = await db.select({ status: employerTask.status }).from(employerTask).where(eq(employerTask.learnerId, session.user.id));
+  const openTaskCount = tasks.filter(({ status }) => ["invited", "accepted"].includes(status)).length;
 
   return (
     <main className="min-h-screen bg-surface-50 text-navy-950">
@@ -40,6 +43,8 @@ export default async function LearnerDashboardPage() {
         </div>
       </header>
       <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
+        {query.accessRequestSubmitted === "1" && <div role="status" className="mb-6 rounded-xl border border-accent-200 bg-accent-50 p-4 text-sm leading-6 text-accent-950"><strong>Your workspace request is in.</strong> You can use your learner workspace while an administrator reviews your request. You will need to sign in again after approval.</div>}
+        {query.accessRequestFailed === "1" && <div role="alert" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>Your learner account is ready, but the workspace request could not be saved.</strong> Please contact a ProofWork administrator and tell them which workspace you requested. Your account remains a learner until approved.</div>}
         <div className="max-w-2xl">
           <Badge variant="secondary" className="mb-4 bg-accent-50 text-accent-800">Your workspace</Badge>
           <h1 className="text-3xl font-semibold tracking-[-.045em] sm:text-4xl">Your work, in one place.</h1>
@@ -50,6 +55,7 @@ export default async function LearnerDashboardPage() {
             <article key={label} className="flex min-h-[154px] flex-col rounded-2xl border border-surface-200 bg-white p-5 shadow-subtle transition-shadow hover:shadow-elevated sm:p-6"><div className="flex items-start justify-between gap-3"><span className="text-sm font-medium text-surface-600">{label}</span><span className="grid size-9 place-items-center rounded-xl bg-accent-50 text-accent-700"><Icon size={17} /></span></div><div className="mt-auto pt-5 text-4xl font-semibold tracking-tight">{value}</div><p className="mt-1 text-xs text-surface-500">{note}</p></article>
           ))}
         </div>
+        <Link href="/dashboard/tasks" className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-accent-100 bg-accent-50/60 p-4 transition hover:border-accent-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"><div><p className="font-semibold">Employer task invitations</p><p className="mt-1 text-sm text-surface-600">Review optional role tasks and share a response if you choose.</p></div><span className="inline-flex items-center gap-2 text-sm font-semibold text-accent-800">{openTaskCount ? `${openTaskCount} need${openTaskCount === 1 ? "s" : ""} your response` : "View tasks"}<ArrowRight className="size-4" /></span></Link>
         <section id="projects" className="mt-9" aria-labelledby="projects-heading">
           <div className="mb-5 flex items-end justify-between gap-4"><div><h2 id="projects-heading" className="text-xl font-semibold tracking-tight">Your projects</h2><p className="mt-1 text-sm text-surface-500">Each project can have multiple immutable submission versions.</p></div><span className="hidden rounded-full bg-surface-100 px-3 py-1 text-xs font-medium text-surface-600 sm:inline-flex">{projects.length} {projects.length === 1 ? "project" : "projects"}</span></div>
           {projects.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

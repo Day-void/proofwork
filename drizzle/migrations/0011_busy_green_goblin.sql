@@ -1,0 +1,3 @@
+ALTER TABLE "employer_task" ADD CONSTRAINT "employer_task_status_check" CHECK ("employer_task"."status" IN ('invited', 'accepted', 'declined', 'submitted', 'reviewed'));--> statement-breakpoint
+ALTER TABLE "workspace_access_request" ADD CONSTRAINT "workspace_access_request_role_check" CHECK ("workspace_access_request"."requested_role" IN ('employer', 'assessor'));--> statement-breakpoint
+ALTER TABLE "workspace_access_request" ADD CONSTRAINT "workspace_access_request_status_check" CHECK ("workspace_access_request"."status" IN ('pending', 'approved', 'declined'));

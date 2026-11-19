@@ -31,6 +31,13 @@ function database() {
   return db;
 }
 
+function transactionDatabase() {
+  if (!transactionalDb) {
+    throw new Error("Assessment updates need a transaction-capable Neon connection. Configure DATABASE_URL_UNPOOLED and try again.");
+  }
+  return transactionalDb;
+}
+
 export async function assignAssessor(formData: FormData) {
   await requireRole(["admin"]);
   const values = z.object({ requestId: z.string().min(1).max(100), assessorId: z.string().min(1).max(100) }).parse({
@@ -75,15 +82,18 @@ export async function recordConflictDisclosure(formData: FormData) {
     eq(assessorReview.conflictStatus, "pending"), eq(assessorReview.status, "assigned"),
   )).limit(1);
   if (!review) throw new Error("This review is not awaiting your disclosure.");
-  const writeStore = transactionalDb ?? store;
-  await writeStore.transaction(async (tx) => {
-    await tx.update(assessorReview).set({
+  await transactionDatabase().transaction(async (tx) => {
+    const [updated] = await tx.update(assessorReview).set({
       conflictStatus: values.decision,
       conflictReason: values.reason || null,
       status: values.decision === "recused" ? "recused" : "in_progress",
-    }).where(eq(assessorReview.id, review.id));
+    }).where(and(
+      eq(assessorReview.id, review.id), eq(assessorReview.assessorId, session.user.id),
+      eq(assessorReview.conflictStatus, "pending"), eq(assessorReview.status, "assigned"),
+    )).returning({ id: assessorReview.id });
+    if (!updated) throw new Error("This review was changed by another request. Refresh and try again.");
     if (values.decision === "cleared") {
-      const [request] = await tx.select({ status: verificationRequest.status }).from(verificationRequest).where(eq(verificationRequest.id, review.requestId)).limit(1);
+      const [request] = await tx.select({ status: verificationRequest.status }).from(verificationRequest).where(eq(verificationRequest.id, review.requestId)).for("update").limit(1);
       if (request) assertTransition(request.status, "in_review");
       await tx.update(verificationRequest).set({ status: "in_review" }).where(eq(verificationRequest.id, review.requestId));
     }
@@ -190,49 +200,65 @@ async function saveReview(formData: FormData, submit: boolean) {
   }
   if (submit && updates.length !== criteria.length) throw new Error("Complete every rubric criterion before submitting the review.");
   if (!submit) {
-    for (const update of updates) {
-      await store.insert(competencyRating).values(update).onConflictDoUpdate({
-        target: [competencyRating.reviewId, competencyRating.criterionId],
-        set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
-      });
-    }
-    revalidatePath(`/assessor/reviews/${reviewId}`);
-    redirect(`/assessor/reviews/${reviewId}?saved=1`);
-  }
-  if (transactionalDb) {
-    await transactionalDb.transaction(async (tx) => {
+    await transactionDatabase().transaction(async (tx) => {
+      const [current] = await tx.select({ id: assessorReview.id }).from(assessorReview).where(and(
+        eq(assessorReview.id, reviewId), eq(assessorReview.assessorId, session.user.id),
+        eq(assessorReview.status, "in_progress"), eq(assessorReview.conflictStatus, "cleared"),
+      )).for("update").limit(1);
+      if (!current) throw new Error("This review changed while you were saving. Refresh and try again.");
       for (const update of updates) {
         await tx.insert(competencyRating).values(update).onConflictDoUpdate({
           target: [competencyRating.reviewId, competencyRating.criterionId],
           set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
         });
       }
-      await tx.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
     });
-  } else {
+    revalidatePath(`/assessor/reviews/${reviewId}`);
+    redirect(`/assessor/reviews/${reviewId}?saved=1`);
+  }
+  await transactionDatabase().transaction(async (tx) => {
+    // Serialize submissions for this request so two assessors cannot both miss
+    // each other's just-submitted review when deciding whether moderation is due.
+    const [request] = await tx.select().from(verificationRequest)
+      .where(eq(verificationRequest.id, review.request.id)).for("update").limit(1);
+    if (!request || !["in_review", "moderation"].includes(request.status)) {
+      throw new Error("This assessment is no longer accepting assessor reviews.");
+    }
+    const [current] = await tx.select({ id: assessorReview.id }).from(assessorReview).where(and(
+      eq(assessorReview.id, reviewId), eq(assessorReview.assessorId, session.user.id),
+      eq(assessorReview.status, "in_progress"), eq(assessorReview.conflictStatus, "cleared"),
+    )).for("update").limit(1);
+    if (!current) throw new Error("This review changed while you were submitting. Refresh and try again.");
     for (const update of updates) {
-      await store.insert(competencyRating).values(update).onConflictDoUpdate({
+      await tx.insert(competencyRating).values(update).onConflictDoUpdate({
         target: [competencyRating.reviewId, competencyRating.criterionId],
         set: { rating: update.rating, rationale: update.rationale, evidenceReference: update.evidenceReference, updatedAt: update.updatedAt },
       });
     }
-    await store.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
-  }
-  const otherReviews = await store.select({ id: assessorReview.id }).from(assessorReview).where(and(
-    eq(assessorReview.requestId, review.request.id), eq(assessorReview.status, "submitted"),
-  ));
-  const [job] = await store.select({ id: aiAnalysisJob.id }).from(aiAnalysisJob).where(eq(aiAnalysisJob.requestId, review.request.id)).limit(1);
-  const [request] = await store.select({ consent: verificationRequest.aiAnalysisConsent }).from(verificationRequest).where(eq(verificationRequest.id, review.request.id)).limit(1);
-  const [aiEnabled] = await store.select({ value: platformSetting.value }).from(platformSetting).where(eq(platformSetting.key, "ai_analysis_enabled")).limit(1);
-  if (!job && request?.consent && aiEnabled?.value === "true") {
-    await store.insert(aiAnalysisJob).values({ id: crypto.randomUUID(), requestId: review.request.id, status: "queued" }).onConflictDoNothing({ target: aiAnalysisJob.requestId });
-  }
-  if (otherReviews.length >= 2) {
-    const submittedIds = otherReviews.map(({ id }) => id);
-    const ratings = await store.select().from(competencyRating).where(inArray(competencyRating.reviewId, submittedIds));
-    const disagreement = requiresModeration(ratings.map((rating) => ({ reviewId: rating.reviewId, criterionId: rating.criterionId, rating: rating.rating })));
-    if (disagreement) await store.update(verificationRequest).set({ status: "moderation" }).where(eq(verificationRequest.id, review.request.id));
-  }
+    await tx.update(assessorReview).set({ status: "submitted", submittedAt: new Date() }).where(eq(assessorReview.id, reviewId));
+
+    if (request.aiAnalysisConsent) {
+      const [aiEnabled] = await tx.select({ value: platformSetting.value }).from(platformSetting)
+        .where(eq(platformSetting.key, "ai_analysis_enabled")).limit(1);
+      if (aiEnabled?.value === "true") {
+        await tx.insert(aiAnalysisJob).values({ id: crypto.randomUUID(), requestId: request.id, status: "queued" })
+          .onConflictDoNothing({ target: aiAnalysisJob.requestId });
+      }
+    }
+
+    const submittedReviews = await tx.select({ id: assessorReview.id }).from(assessorReview).where(and(
+      eq(assessorReview.requestId, request.id), eq(assessorReview.status, "submitted"),
+    ));
+    if (submittedReviews.length >= 2) {
+      const ratings = await tx.select().from(competencyRating)
+        .where(inArray(competencyRating.reviewId, submittedReviews.map(({ id }) => id)));
+      const disagreement = requiresModeration(ratings.map((rating) => ({
+        reviewId: rating.reviewId, criterionId: rating.criterionId, rating: rating.rating,
+      })));
+      if (disagreement) await tx.update(verificationRequest).set({ status: "moderation" })
+        .where(eq(verificationRequest.id, request.id));
+    }
+  });
   revalidatePath("/assessor");
   revalidatePath("/admin/assessments");
   redirect("/assessor?reviewSubmitted=1");

@@ -1,6 +1,6 @@
 # Feature Status
 
-*Last updated: 2026-11-16 (end-to-end assessment and reporting workflows implemented)*
+*Last updated: 2026-11-19 (test-branch migrations, Neon contract check, and dedicated test admin setup completed; manual product review and provider setup remain)*
 
 ## Legend
 
@@ -52,15 +52,16 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Database schema | ✅ | Auth tables, learner-default role, and foreign keys defined with Drizzle |
-| Database migrations | ✅ | Auth, learner submission, role seed, and assessor calibration migrations applied to Neon |
+| Database migrations | ✅ | Existing migrations remain on Neon; new workspace-access and employer-task migrations 0010–0012 were applied and verified on disposable branch `proofwork-feature-test`. Production remains pending review. |
 | Better Auth integration | ✅ | Neon HTTP adapter, Next route handler, and secure session policy |
 | User registration | ✅ | Email/password registration; role is server-controlled and defaults to learner |
+| Employer/assessor access requests | ✅ | Signup captures requested workspace; admins approve or decline at `/admin/users`; elevated roles are not self-assigned |
 | Login | ✅ | Email/password sign-in with workspace routing |
 | Session handling | ✅ | Seven-day database sessions and password-reset revocation |
-| RBAC | ✅ | Learner, assessor, moderator, and admin roles enforced server-side |
+| RBAC | ✅ | Learner, assessor, moderator, admin, and employer roles enforced server-side; elevated roles require admin approval |
 | Protected routes | ✅ | Workspace pages require the matching authenticated role |
 | Password recovery | ✅ | One-hour reset token, generic request response, Resend delivery, and rate limits |
-| Runtime credentials | 🔄 | Local Neon and auth credentials are configured. Resend key/sender, R2 credentials, OpenAI key, and cron secret are not configured. |
+| Runtime credentials | 🔄 | Local Neon and Better Auth values are present; the local auth URLs point to localhost. Resend key/sender values are present but delivery is unverified. A cron secret is present locally; Vercel configuration is unverified. OpenAI and R2 values are empty. |
 
 ## Phase 3 — Learner Submissions
 
@@ -107,17 +108,19 @@
 | Audit logs | ✅ | Recent 200 administrative, moderation, access, and report-sharing events |
 | Platform settings | ✅ | New requests, employer discovery, and AI assistance default off and are admin-controlled |
 | Employer profile discovery and report access | ✅ | Employer role sees only learner-opted-in profiles and opted-in approved roles; private report links are independently revocable |
+| Employer role tasks | ✅ | Employers can invite eligible opted-in learners; learners accept/decline, submit a response and optional link, and receive employer feedback |
 
 ## Phase 7 — Testing & Deployment
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Unit tests | ✅ | Five native Node tests cover disagreement thresholds and duplicate-review handling |
-| Integration tests | ⬜ | Route/database integration harness is not configured |
+| Unit tests | ✅ | Ten native Node tests cover assessment state/scoring and employer task transitions |
+| Integration tests | 🔄 | Disposable Neon schema and workflow contract test passes (`npm run test:integration`); route-handler integration coverage is not configured |
 | E2E tests | ⬜ | Hosted auth/storage journeys need production-like credentials and browser runner setup |
-| Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass |
-| Production build | ✅ | `npm run build` passes |
-| Deployment config | 🔄 | `vercel.json` schedules the worker; Vercel project, domain, and encrypted environment variables remain to be configured |
+| Manual journey checklist | ✅ | `tests/e2e/README.md` defines role approval, privacy, employer-task, assessment, AI consent, account-disable, and responsive journeys |
+| Lint and typecheck | ✅ | `npm run lint` and `npm run typecheck` pass after the current changes |
+| Production build | 🔄 | The latest isolated build compiled and passed TypeScript, but prerendering failed when Windows returned `EPERM` creating a generated `.next/server/app/*.segments` directory, even outside OneDrive and with one build worker. The Codex sandbox's temporary path also contains `!`, which Webpack rejects. Run the full build from a regular local terminal or CI to verify. |
+| Deployment config | 🔄 | The app is live at `proofwork-steel.vercel.app` and `vercel.json` schedules the worker daily. The local checkout is not linked to the Vercel project; the owner needs to verify existing Production variables and cron behavior. |
 
 ## Known Security Advisories
 
@@ -131,5 +134,10 @@
 
 ## Technical Blockers
 
-- The in-app browser could not reach the local preview on either `localhost:3000` or `127.0.0.1:3000`, so responsive visual review remains pending.
-- Production email, Cloudflare R2, OpenAI, and cron credentials are not configured in `.env.local` or the current process environment.
+- Manual browser review of the updated signup, access approval, employer task, learner task, responsive, and keyboard journeys remains pending.
+- Local Resend and cron values are present but delivery/job execution are unverified; OpenAI and R2 values are absent locally. Vercel previously reported the core Neon/auth/app URL/cron variable names as already present, but their values and runtime behavior still need owner verification.
+- The test branch has a dedicated admin account; the manual registration/access-request and employer-task journeys still need to be exercised in the browser.
+- The latest isolated production build compiled and passed TypeScript, then hit a Windows `EPERM` creating a generated `.segments` directory during prerendering, even outside OneDrive with one worker. The Codex sandbox's temporary path is also incompatible with Webpack because it contains `!`; verify the full build in a regular local terminal or CI.
+- Migrations `0010_little_tag.sql` through `0012_real_mother_askani.sql` are applied to `proofwork-feature-test`; they have not been applied to Production.
+- Vercel/browser end-to-end runs, the new signup and employer-task journeys, and manual accessibility review remain to be performed against a test deployment.
+- Automated browser E2E and route-handler integration suites are not installed; the database contract test and manual journey checklist exist, and employer task state rules are covered by unit tests.
