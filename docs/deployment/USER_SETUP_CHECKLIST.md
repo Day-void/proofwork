@@ -6,9 +6,9 @@ Use this checklist for the live account-owner handoff. Keep each secret inside t
 
 This change adds the `workspace_access_request` and `employer_task` tables, validates their statuses, and prevents duplicate pending requests for the same user/workspace. The generated SQL is in migrations `0010_little_tag.sql`, `0011_busy_green_goblin.sql`, and `0012_real_mother_askani.sql`.
 
-1. Migrations `0010`–`0012` were applied to Neon branch `proofwork-feature-test`, then to Production branch `br-cold-hill-beami78w` on 2026-11-19. Production's Drizzle ledger now includes migration `0012`.
+1. Migrations `0010`–`0012` were applied to Production branch `br-cold-hill-beami78w` on 2026-11-19. Production's Drizzle ledger includes migration `0012`. The `proofwork-feature-test` branch is now a schema-only branch based on Production's current schema; it contains no copied Production rows.
 2. Migrations `0010_little_tag.sql` through `0012_real_mother_askani.sql` create access/task tables, indexes, and constraints; they do not rewrite existing user or submission data.
-3. `npm run test:integration` passes against the test branch. Complete the manual signup, access approval, and employer-task journeys with dedicated test accounts before release.
+3. `npm run test:integration` and the guarded Playwright employer signup and task-lifecycle journeys pass against `proofwork-feature-test`. The owner also confirmed that approving an employer request and signing in again opens the employer dashboard. Employer discovery still needs to be enabled by an administrator before invitations can be sent in Production.
 4. Production preflight checks returned zero duplicate AI jobs, malformed challenge/submission evidence rows, or duplicate verification pairs. The Production migration is complete. For future migrations, verify the active branch and ledger before running `npm run db:migrate`.
 
 The following read-only queries document the preflight checks used before the 2026-11-19 Production migration. They are included for audit/reference; they do not need to be rerun for migrations already recorded in Production:
@@ -73,7 +73,7 @@ Do not run the migration in a terminal until you have checked which Neon branch 
 
    Confirm it returns exactly one row with the intended email and `admin` role. If it returns no row, the account has not registered on Production; stop and register it first. Do not change any other account's role, and do not manually set `email_verified` to true.
 5. Sign in again at the live site; the refreshed session should open the admin workspace. Open the hamburger menu and choose **User management**.
-6. For employer or assessor requests, review the applicant and reason; approval changes the role and marks the request in the same database statement, then revokes existing sessions. Ask the applicant to sign in again.
+6. For employer or assessor requests, review the applicant and reason; approval changes the role and marks the request in the same database statement, then revokes existing sessions. Ask the applicant to sign in again. The Production employer approval and fresh-sign-in flow has been confirmed by the owner.
 
 If the initial administrator account or credentials are unavailable, recover access through the existing trusted admin process. Do not send passwords or connection strings in chat.
 
@@ -107,9 +107,9 @@ Resend did not respond from the user's network during prior setup, and no owned 
 
 ## 7. Deployment status and remaining owner checks
 
-1. Commit `89e4351` has been pushed and deployed to `proofwork-steel.vercel.app`; the Vercel deployment completed, the public pages returned HTTP 200, and the owner confirmed that admin sign-in opens the admin dashboard.
+1. The latest release commit is pushed and deployed to `proofwork-steel.vercel.app`; the Vercel deployment completed, production smoke checks passed, and the owner confirmed that admin sign-in opens the admin dashboard.
 2. The Production migrations are applied, and `maringisanwaday@gmail.com` is an active admin. Its email is currently unverified because ProofWork does not yet enforce or send email verification at signup.
 3. Confirm the Production environment variables and daily cron behavior in Vercel.
-4. Complete the manual journeys in `tests/e2e/README.md`, including signup, learner projects, role approval, employer invitations, assessor review, User management, and admin controls.
+4. Complete the remaining owner checks in `tests/e2e/README.md`: confirm Production environment variables and cron behavior, then enable employer discovery only when an opted-in learner with an approved discoverable role is available. The employer invitation/learner response/employer feedback lifecycle is covered by the guarded E2E test on the schema-only branch; assessor review and admin controls still need an appropriate dedicated test account for a manual walkthrough.
 
 Employer discovery and AI remain off until an administrator enables them. R2 and Resend are optional integrations; R2 requires accepting usage-based billing and Resend delivery requires a verified sender domain.
